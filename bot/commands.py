@@ -2,7 +2,7 @@ import asyncio
 from bot.service import (
     generate_pokemon_messages,
     fetch_pokemon_data,
-    coordinates_waiting_time
+    test_generate_pokemon_messages
 )
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -94,8 +94,7 @@ async def start_pvp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
             return
         else:
-            coordinates_lista_size = len(fetch_pokemon_data())
-            waiting_time = 1 + coordinates_waiting_time(coordinates_lista_size)
+            waiting_time = test_generate_pokemon_messages()
             await update.message.reply_text(
                 f"En {waiting_time:.2f} segundos se enviarán las coordenadas..."
             )
