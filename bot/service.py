@@ -1,4 +1,4 @@
-import requests, logging, re
+import requests, logging, re, time
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -86,3 +86,11 @@ def generate_pokemon_messages():
         return None
     return total_message
 
+
+def test_generate_pokemon_messages():
+    start_time = time.time()  
+    generate_pokemon_messages()  
+    end_time = time.time()  
+
+    execution_time = end_time - start_time 
+    return execution_time
