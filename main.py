@@ -8,16 +8,16 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-from bot.handlers import error_handler, text_handler
-from bot.commands import start_pvp, stop
+from bot.handlers import error_handler, text_handler, unknown_command
+from bot.commands import start_pvp_1500, stop
 
 
 def add_handlers(dp):
     dp.add_error_handler(error_handler)
-    dp.add_handler(CommandHandler("pvp", start_pvp))
+    dp.add_handler(CommandHandler("pvp1500", start_pvp_1500))
     dp.add_handler(CommandHandler("stop", stop))
     dp.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
-
+    dp.add_handler(MessageHandler(filters.COMMAND, unknown_command))
 
 add_handlers(ptb)
 

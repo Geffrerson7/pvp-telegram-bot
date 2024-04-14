@@ -1,8 +1,8 @@
 import asyncio
 from bot.service import (
-    generate_pokemon_messages,
-    fetch_pokemon_data,
-    test_generate_pokemon_messages
+    generate_pvp_1500_pokemon_messages,
+    fetch_pvp_1500_pokemon_data,
+    coordinates_waiting_time
 )
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -23,7 +23,7 @@ async def send_coordinates(
     context: ContextTypes.DEFAULT_TYPE, total_text: List[str]):
     if total_text:
         messages_number = len(total_text)
-        message_delay = 3 if len(total_text) > 20 else 2
+        message_delay = 3 if len(total_text) > 18 else 2
         plural_letter = "" if messages_number == 1 else "s"
         await context.bot.send_message(
             chat_id=GRUPO_COORDENADAS_ID,
@@ -45,9 +45,9 @@ async def send_coordinates(
         )
 
 
-async def callback_coordinate_start_pvp(context: ContextTypes.DEFAULT_TYPE):
+async def callback_coordinate_start_pvp_1500(context: ContextTypes.DEFAULT_TYPE):
     try:
-        total_text = generate_pokemon_messages()
+        total_text = generate_pvp_1500_pokemon_messages()
         await send_coordinates(context, total_text)
     except telegram.error.RetryAfter as e:
         await asyncio.sleep(e.retry_after)
@@ -60,7 +60,7 @@ async def callback_coordinate_start_pvp(context: ContextTypes.DEFAULT_TYPE):
             text=message,
         )
         print(f"Error de RetryAfter en callback_coordinate: {e}")
-        total_text_retry = generate_pokemon_messages()
+        total_text_retry = generate_pvp_1500_pokemon_messages()
         await send_coordinates(context, total_text_retry)
     except Exception as e:
         print(f"Error en callback_coordinate_pvp: {e}")
@@ -70,7 +70,7 @@ async def callback_coordinate_start_pvp(context: ContextTypes.DEFAULT_TYPE):
             text=message,
         )
 
-async def start_pvp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def start_pvp_1500(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         # Verificar si el usuario está permitido para activar los comandos
         if update.effective_user.id not in USUARIOS_PERMITIDOS:
@@ -86,31 +86,32 @@ async def start_pvp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
             return
 
-        job_start_pvp = context.chat_data.get("callback_coordinate_start_pvp")
+        job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
 
-        if job_start_pvp:
+        if job_start_pvp_1500:
             await update.message.reply_text(
                 "Las coordenadas de PVP se están enviando. Si desea detner el envío digite /stop"
             )
             return
         else:
-            waiting_time = test_generate_pokemon_messages()
+            coordinates_lista_size = len(fetch_pvp_1500_pokemon_data())
+            waiting_time = 1 + coordinates_waiting_time(coordinates_lista_size)
             await update.message.reply_text(
                 f"En {waiting_time:.2f} segundos se enviarán las coordenadas..."
             )
-            job_start_pvp = context.job_queue.run_repeating(
-                callback_coordinate_start_pvp, interval=PERIOD * 60, first=1
+            job_start_pvp_1500 = context.job_queue.run_repeating(
+                callback_coordinate_start_pvp_1500, interval=PERIOD * 60, first=1
             )
-            context.chat_data["callback_coordinate_start_pvp"] = job_start_pvp
+            context.chat_data["callback_coordinate_start_pvp_1500"] = job_start_pvp_1500
 
     except telegram.error.TelegramError as e:
         print(f"Error de Telegram: {e}")
         await update.message.reply_text(
-            "Se ha producido un error al ejecutar el comando /pvp. Por favor, comunica este error al administrador del bot para que pueda solucionarlo lo antes posible."
+            "Se ha producido un error al ejecutar el comando /pvp1500. Por favor, comunica este error al administrador del bot para que pueda solucionarlo lo antes posible."
         )
 
     except Exception as e:
-        print(f"Error en start: {e}")
+        print(f"Error en start_pvp_1500(): {e}")
         await update.message.reply_text(
             "Lo siento, ha ocurrido un error con el bot. Por favor, comunica este error al administrador del bot para que pueda solucionarlo lo antes posible."
         )
@@ -132,11 +133,11 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
             return
 
-        job_start_pvp = context.chat_data.get("callback_coordinate_start_pvp")
+        job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
 
-        if job_start_pvp:
-            job_start_pvp.schedule_removal()
-            del context.chat_data["callback_coordinate_start_pvp"]
+        if job_start_pvp_1500:
+            job_start_pvp_1500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_1500"]
             await update.message.reply_text(
                 "El envío de coordenadas PVP ha sido detenido."
             )

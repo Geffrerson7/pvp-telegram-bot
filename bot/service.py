@@ -1,51 +1,207 @@
-import requests, logging, re, time
-from bs4 import BeautifulSoup
-from datetime import datetime
+import requests, logging, re, time, json, datetime
 
 
-def fetch_pokemon_data():
+def retrieve_flag(url):
+    if url == "https://vanpokemap.com/query2.php":
+        return "🇨🇦Vancouver, Canadá"
+    elif url == "https://nycpokemap.com/query2.php":
+        return "🇺🇸Nueva York, Estados Unidos"
+    elif url == "https://londonpogomap.com/query2.php":
+        return "🇬🇧Londres, Reino Unido"
+    elif url == "https://sgpokemap.com/query2.php":
+        return "🇸🇬Singapur, Singapur"
+    elif url == "https://sydneypogomap.com/query2.php":
+        return "🇦🇺Sydney, Australia"
+
+
+def fetch_pokemon_data_by_iv(iv):
+    """Obtains Pokemon data from multiple sources based on IV and returns a combined list of Pokemon."""
+    total_data = []
+    urls = [
+        "https://vanpokemap.com/query2.php",
+        "https://nycpokemap.com/query2.php",
+        "https://londonpogomap.com/query2.php",
+        "https://sgpokemap.com/query2.php",
+        "https://sydneypogomap.com/query2.php",
+    ]
+
+    headers = {
+        "https://vanpokemap.com/query2.php": {"Referer": "https://vanpokemap.com/"},
+        "https://nycpokemap.com/query2.php": {"Referer": "https://nycpokemap.com/"},
+        "https://londonpogomap.com/query2.php": {
+            "Referer": "https://londonpogomap.com/"
+        },
+        "https://sgpokemap.com/query2.php": {"Referer": "https://sgpokemap.com/"},
+        "https://sydneypogomap.com/query2.php": {
+            "Referer": "https://sydneypogomap.com/"
+        },
+    }
+
+    params = {
+        "mons": ",".join(str(i) for i in range(999)),
+        "minIV": str(iv),
+        "time": int(time.time()),
+        "since": 0,
+    }
+
+    for url in urls:
+        headers_for_url = headers.get(url, {})
+        try:
+            response = requests.get(url, params=params, headers=headers_for_url)
+            response.raise_for_status()  # Si ocurre un error, lanzará una excepción
+            data = response.json()
+            for pokemon in data.get("pokemons", []):
+                pokemon["flag"] = retrieve_flag(url)
+                total_data.append(pokemon)
+        except requests.exceptions.RequestException as e:
+            logging.warning(f"Failed to fetch data from {url}: {e}")
+        except json.decoder.JSONDecodeError as e:
+            logging.error(f"Failed to decode JSON response from {url}: {e}")
+
+    total_data.sort(key=lambda x: x["despawn"], reverse=True)
+    return total_data
+
+
+def retrieve_pokemon_name(pokemon_id):
+    """Gets the name of a Pokémon based on its ID using the PokeAPI."""
     try:
+        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}"
+        response = requests.get(pokeapi_url)
+        response.raise_for_status()
 
-        url = "https://moonani.com/PokeList/pvp.php"
-        response = requests.get(url)
+        data = response.json()
+        name = data.get("name").title()
 
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, "html.parser")
-            table = soup.find("table", {"id": "customers"})
-            data_list = []
+        return name
+    except requests.exceptions.RequestException as e:
+        logging.warning(f"Error fetching Pokémon name for ID {pokemon_id}: {e}")
+    except ValueError as e:
+        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
 
-            if table:
-                for row in table.find_all("tr")[1:]:
-                    cells = row.find_all("td")
-                    if len(cells) > 0:
-                        data = {
-                            "Name": cells[1].text.strip(),
-                            "CP": cells[4].text.strip(),
-                            "Level": cells[5].text.strip(),
-                            "Shiny": cells[11].text.strip(),
-                            "Start Time": cells[13].text.strip(),
-                            "End Time": cells[14].text.strip(),
-                            "Coords": cells[3].text.strip(),
-                        }
-                        data_list.append(data)
+    return None
 
-                # Ordenar los datos por "End Time" en orden descendente
-                data_list.sort(key=lambda x: x["End Time"], reverse=True)
-            else:
-                print("Error: No se encontró la tabla de datos en la página web.")
+
+def retrieve_pokemon_height(pokemon_id):
+    """Gets the height of a Pokémon based on its ID using the PokeAPI."""
+    try:
+        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}"
+        response = requests.get(pokeapi_url)
+        response.raise_for_status()
+
+        data = response.json()
+        height = data.get("height") / 10
+
+        return str(height)
+    except requests.exceptions.RequestException as e:
+        logging.warning(f"Error fetching Pokemon height for ID {pokemon_id}: {e}")
+    except ValueError as e:
+        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
+
+    return None
+
+
+def retrieve_pokemon_weight(pokemon_id):
+    """Gets the weight of a Pokémon based on its ID using the PokeAPI."""
+    try:
+        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}"
+        response = requests.get(pokeapi_url)
+        response.raise_for_status()
+
+        data = response.json()
+        weight = data.get("weight") / 10
+
+        return str(weight)
+    except requests.exceptions.RequestException as e:
+        logging.warning(f"Error fetching Pokemon weight for ID {pokemon_id}: {e}")
+    except ValueError as e:
+        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
+
+    return None
+
+
+def calculate_remaining_time(despawn, delay):
+    """Obtains the despawn time and calculates the remaining time until then."""
+    try:
+        if despawn is None:
+            return None
         else:
-            print(f"Error: Respuesta inesperada del servidor ({response.status_code})")
-
-        return data_list
-
+            end_time_24h = datetime.datetime.fromtimestamp(despawn)
+            current_time = datetime.datetime.now()
+            remaining_time = end_time_24h - current_time
+            seconds = round(remaining_time.total_seconds() - delay)
+            minutes, seconds = divmod(seconds, 60)
+            if minutes < 0 or seconds < 0:
+                return None
+            formatted_dsp = f"{minutes}:{seconds:02}"
+            return formatted_dsp
     except Exception as e:
-        print(f"Error: {e}")
-        return []
+        logging.error(f"Error calculating despawn time: {e}")
+
+    return None
 
 
-def calculate_time(time):
-    new_time = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-    return new_time
+def retrieve_move_icon(move_type):
+    """Returns an emoji representing the type of a Pokémon move."""
+    if move_type == "steel":
+        return "⚙️"
+    elif move_type == "water":
+        return "💧"
+    elif move_type == "bug":
+        return "🐞"
+    elif move_type == "dragon":
+        return "🐲"
+    elif move_type == "electric":
+        return "⚡"
+    elif move_type == "ghost":
+        return "👻"
+    elif move_type == "fire":
+        return "🔥"
+    elif move_type == "ice":
+        return "❄️"
+    elif move_type == "fairy":
+        return "🌸"
+    elif move_type == "fighting":
+        return "🥊"
+    elif move_type == "normal":
+        return "🔘"
+    elif move_type == "grass":
+        return "🍃"
+    elif move_type == "psychic":
+        return "🔮"
+    elif move_type == "rock":
+        return "🪨"
+    elif move_type == "dark":
+        return "☯️"
+    elif move_type == "ground":
+        return "⛰️"
+    elif move_type == "poison":
+        return "☠️"
+    elif move_type == "flying":
+        return "🪽"
+    else:
+        return ""
+
+
+def retrieve_pokemon_move(pokemon_move_id):
+    """Gets the move name of a Pokemon based on the move ID using the PokeAPI."""
+    try:
+        pokeapi_url = f"https://pokeapi.co/api/v2/move/{pokemon_move_id}"
+        response = requests.get(pokeapi_url)
+        response.raise_for_status()
+
+        data = response.json()
+        name = data["names"][5]["name"]
+        move_type = data["type"]["name"]
+        icon = retrieve_move_icon(move_type)
+        return {"name": name, "icon": icon}
+    except requests.exceptions.RequestException as e:
+        logging.warning(
+            f"Error fetching Pokemon move name for ID {pokemon_move_id}: {e}"
+        )
+    except ValueError as e:
+        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
+
+    return None
 
 
 def coordinates_waiting_time(coordinates_list_size):
@@ -54,29 +210,157 @@ def coordinates_waiting_time(coordinates_list_size):
 
 
 def escape_string(input_string):
-    """Replaces characters '-' with '\-', and characters '.' with '\.' """
+    """Replaces characters '-' with '\-', and characters '.' with '\.'"""
     return re.sub(r"[-.]", lambda x: "\\" + x.group(), input_string)
 
 
-def generate_pokemon_messages():
+def get_pokemon_evolutions(pokemon_name):
+    """Retrieves the evolution chain for a given Pokemon name."""
+    for i in range(1, 542):
+        evolution_chain_url = f"https://pokeapi.co/api/v2/evolution-chain/{i}"
+        response = requests.get(evolution_chain_url)
+        if response.status_code == 200:
+            evolution_names = []
+            evolution_data = response.json()
+            chain = evolution_data.get("chain", {})
+            species_name = chain.get("species", {}).get("name", "")
+            if species_name == pokemon_name and len(chain["evolves_to"]) == 1:
+                current_evolution = chain
+                while current_evolution:
+                    species_name = current_evolution["species"]["name"]
+                    evolution_names.append(species_name)
+                    current_evolution = current_evolution.get("evolves_to", [])
+                    if current_evolution:
+                        current_evolution = current_evolution[0]
+                return evolution_names[1:]
+            elif species_name == pokemon_name and len(chain["evolves_to"]) > 1:
+                for evolution in chain["evolves_to"]:
+                    species_name_2 = evolution["species"]["name"]
+                    evolution_names.append(species_name_2)
+                return evolution_names
+    return None
+
+
+def fetch_pvp_1500_pokemon_data():
+    """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
+    pvp_pokemon_list = []
+    with open("data/pvp1500_data.json", "r") as file:
+        data = json.load(file)
+    for iv in range(100, 70, -10):
+        pokemons_list = fetch_pokemon_data_by_iv(iv)
+        for pokemon in pokemons_list:
+            pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
+            pokemon_evolution_names = get_pokemon_evolutions(pokemon_name.lower())
+            for pvp_pokemon in data:
+                iv = pvp_pokemon["IV"]
+                attack, defence, stamina = iv.split("/")
+                if (
+                    (
+                        pvp_pokemon["Name"][1:] == pokemon_name
+                        or pvp_pokemon["Name"][1:] == pokemon_evolution_names[0]
+                        or (
+                            len(pokemon_evolution_names) > 1
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[1]
+                        )
+                        or (
+                            len(pokemon_evolution_names) > 2
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[2]
+                        )
+                        or (
+                            len(pokemon_evolution_names) > 3
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[3]
+                        )
+                        or (
+                            len(pokemon_evolution_names) > 4
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[4]
+                        )
+                        or (
+                            len(pokemon_evolution_names) > 5
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[5]
+                        )
+                        or (
+                            len(pokemon_evolution_names) > 6
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[6]
+                        )
+                        or (
+                            len(pokemon_evolution_names) > 7
+                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[7]
+                        )
+                    )
+                    and attack == pokemon["attack"]
+                    and defence == pokemon["defence"]
+                    and stamina == pokemon["stamina"]
+                ):
+                    # Ahora puedes acceder a los valores de pvp_pokemon
+                    pokemon_dict = {
+                        "pokemon": pokemon,
+                        "ranking": pvp_pokemon,
+                        "iv": iv,
+                    }
+                    pvp_pokemon_list.append(pokemon_dict)
+    return pvp_pokemon_list
+
+
+def signature():
+    return "✍🏻•´¯•. ☆ Jσʂé Lυιʂ ☆ .•´¯•✍🏻"
+
+def generate_pvp_1500_pokemon_messages():
+    """Retrieves Pokemon data, formats it into messages, and returns a list of formatted messages ready to be sent."""
     try:
         total_message = []
-        total_data = fetch_pokemon_data()
+        total_data = fetch_pvp_1500_pokemon_data()
         if total_data != []:
+            message_delay = 3 if len(total_data) > 18 else 2
             for data in total_data:
-                name = escape_string(data['Name'])
-                start_time = calculate_time(data["Start Time"])
-                end_time = calculate_time(data["End Time"])
-                shiny_icon = "✨" if data["Shiny"].lower() == "yes" else ""
+                delay = (
+                    1
+                    + coordinates_waiting_time(len(total_data))
+                    + message_delay * total_data.index(data)
+                )
+                dsp = calculate_remaining_time(data["pokemon"]["despawn"], delay)
+                pokemon_name = escape_string(
+                    retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
+                )
+                iv_number = data["iv"]
+                cp = data["pokemon"]["cp"]
+                level = data["pokemon"]["level"]
+                shiny_icon = "✨" if data["pokemon"]["shiny"] == 0 else ""
+                latitude = data["pokemon"]["lat"]
+                longitude = data["pokemon"]["lng"]
+                flag = data["pokemon"]["flag"]
+                move1 = escape_string(
+                    retrieve_pokemon_move(data["pokemon"]["move1"])["name"]
+                )
+                move2 = escape_string(
+                    retrieve_pokemon_move(data["pokemon"]["move2"])["name"]
+                )
+                move1_icon = retrieve_pokemon_move(data["pokemon"]["move1"])["icon"]
+                move2_icon = retrieve_pokemon_move(data["pokemon"]["move2"])["icon"]
+                height = escape_string(
+                    retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
+                )
+                weight = escape_string(
+                    retrieve_pokemon_weight(data["pokemon"]["pokemon_id"])
+                )
+                ranking_pvp_pokemon = data["ranking"]["#"]
+                name_pvp_pokemon = data["ranking"]["Name"]
+                cp_pvp_pokemon = data["ranking"]["CP"]
+                level_pvp_pokemon = escape_string(data["ranking"]["Level"])
+                pvp_signature = escape_string(signature())
+                gender_icon = "♂️" if data["pokemon"]["gender"] == 1 else "♀️"
                 formatted_message = (
-                    f"🅐 {name}{shiny_icon}\n"
-                    f"🅔🛡L{data['Level']} CP {data['CP']}\n"
-                    f"🌀🏅🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🥊🌀\n"
-                    f"⌚sᴛᴀʀᴛ ᴛɪᴍᴇ\n"
-                    f"`{start_time}`\n"
-                    f"⌚ᴇɴᴅ ᴛɪᴍᴇ\n"
-                    f"`{end_time}`\n"
-                    f"`{data['Coords']}`"
+                    f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
+                    f"IV:{iv_number} CP:{cp} LV:{level}\n"
+                    f"⚖️{weight}kg 📏{height}m\n"
+                    f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
+                    f"                     ▼\n"
+                    f"\#0{ranking_pvp_pokemon} \- *{name_pvp_pokemon}* 🅶🅻\n"
+                    f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
+                    f"🌀🏅🄰🄴 ᴇʟᴇᴍᴇɴᴛs ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
+                    f"      ˢⁿⁱᵖᵉʳ 🄰🄴 ᵉˡᵉᵐᵉⁿᵗˢ\n"
+                    f" {pvp_signature}\n"
+                    f"{flag}\n"
+                    f"`{latitude},{longitude}`"
                 )
                 total_message.append(formatted_message)
         else:
@@ -85,12 +369,3 @@ def generate_pokemon_messages():
         logging.error(f"Error sending Pokemon data: {e}")
         return None
     return total_message
-
-
-def test_generate_pokemon_messages():
-    start_time = time.time()  
-    generate_pokemon_messages()  
-    end_time = time.time()  
-
-    execution_time = end_time - start_time 
-    return execution_time

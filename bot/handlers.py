@@ -35,22 +35,21 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No tienes permiso para utilizar este comando.")
         return
 
-    job = context.chat_data.get("callback_coordinate")
+    job = context.chat_data.get("callback_coordinate_start_pvp_1500")
 
     if job:
         await update.message.reply_text(
             "Lo siento, ya hay una instancia activa del bot. Por favor, espera a que se detenga antes de iniciar otra."
         )
         return
-
     # Si no hay instancia activa, proceder con el manejo del mensaje
     user_name = update.effective_user.first_name
     message_text = f"¡Hola {user_name}, bienvenido a Adventure Elements!\n"
     message_text += "Este es un menú explicativo:\n\n"
-    message_text += "/pvp - Inicia el envío de coordenadas PVP.\n"
+    message_text += "/pvp1500 - Inicia el envío de coordenadas PVP 1500.\n"
     message_text += "/stop - Detiene el envío de  PVP.\n"
 
-    keyboard = [["/pvp", "/stop"]]
+    keyboard = [["/pvp1500", "/stop"]]
     reply_markup = ReplyKeyboardMarkup(
         keyboard, one_time_keyboard=True, resize_keyboard=True
     )
@@ -92,3 +91,11 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         )
     except Exception as e:
         print(f"Error en error_handler(): {e}")
+
+
+async def unknown_command(update, context):
+    message_text = f"Lo siento, el comando ingresado no es válido.\n"
+    message_text += "Esta es la lista de comandos válidos:\n\n"
+    message_text += "/pvp1500 - Inicia el envío de coordenadas PVP 1500.\n"
+    message_text += "/stop - Detiene el envío de  PVP.\n"
+    await update.message.reply_text(message_text)
