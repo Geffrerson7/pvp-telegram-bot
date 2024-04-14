@@ -1,0 +1,36 @@
+{
+    "pokemons": [
+      {
+        "pokemon_id": 659,
+        "lat": 51.47039754,
+        "lng": -0.12702519,
+        "despawn": 1708984176,
+        "disguise": 0,
+        "attack": 15,
+        "defence": 15,
+        "stamina": 15,
+        "move1": 219,
+        "move2": 31,
+        "costume": -1,
+        "gender": 1,
+        "shiny": 0,
+        "form": -1,
+        "cp": 268,
+        "level": 17,
+        "weather": 0
+      }
+    ],
+    "meta": { "inserted": 1708983503, "time": 1708983532 },
+    "weathers": [
+      { "cell_id": "5221390504796618752", "weather": 5 },
+      { "cell_id": "5221366315540807680", "weather": 5 },
+      { "cell_id": "5177073589127479296", "weather": 5 },
+      { "cell_id": "5177071390104223744", "weather": 5 },
+      { "cell_id": "5221377310657085440", "weather": 5 },
+      { "cell_id": "5221392703819874304", "weather": 5 },
+      { "cell_id": "5221364116517552128", "weather": 5 },
+      { "cell_id": "5221379509680340992", "weather": 5 },
+      { "cell_id": "5221361917494296576", "weather": 5 },
+      { "cell_id": "5221368514564063232", "weather": 5 }
+    ]
+  }

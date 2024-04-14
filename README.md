@@ -29,7 +29,7 @@ $ git clone https://github.com/Geffrerson7/pokemon-coordinates-telegram-bot.git
 Navigate to the project directory
 
 ```bash
-$ cd iv100
+$ cd pokemon-coordinates-telegram-bot
 ```
 
 Create a virtual environment
