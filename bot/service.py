@@ -1,7 +1,7 @@
 import requests, logging, re, time, json, datetime
 
 
-def retrieve_flag(url):
+def retrieve_flag(url:str):
     if url == "https://vanpokemap.com/query2.php":
         return "🇨🇦Vancouver, Canadá"
     elif url == "https://nycpokemap.com/query2.php":
@@ -214,6 +214,11 @@ def escape_string(input_string):
     return re.sub(r"[-.]", lambda x: "\\" + x.group(), input_string)
 
 
+def signature():
+    """Return admin siganture"""
+    return "✍🏻•´¯•. ☆ Jσʂé Lυιʂ ☆ .•´¯•✍🏻"
+
+
 def get_pokemon_evolutions(pokemon_name):
     """Retrieves the evolution chain for a given Pokemon name."""
     for i in range(1, 542):
@@ -241,6 +246,20 @@ def get_pokemon_evolutions(pokemon_name):
     return None
 
 
+def pokemon_is_galarian(pokemon_name: str, pokemon_move_1: str) -> bool:
+    
+    if pokemon_name == "Stunfisk" and (pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"):
+        return True
+    return False
+
+
+def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
+    
+    if pokemon_name == "Rattata" and (pokemon_move_1 == "Ataque Rápido" or pokemon_move_1 == "Placaje"):
+        return True
+    return False
+
+
 def fetch_pvp_1500_pokemon_data():
     """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
     pvp_pokemon_list = []
@@ -251,45 +270,51 @@ def fetch_pvp_1500_pokemon_data():
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
             pokemon_evolution_names = get_pokemon_evolutions(pokemon_name.lower())
+            pokemon_move_first = retrieve_pokemon_move(pokemon["move1"])
             for pvp_pokemon in data:
                 iv = pvp_pokemon["IV"]
                 attack, defence, stamina = iv.split("/")
                 if (
                     (
-                        pvp_pokemon["Name"][1:] == pokemon_name
-                        or pvp_pokemon["Name"][1:] == pokemon_evolution_names[0]
+                        pvp_pokemon["Name"] == pokemon_name
+                        or (
+                            len(pokemon_evolution_names) != 0
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[0]
+                        )
                         or (
                             len(pokemon_evolution_names) > 1
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[1]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[1]
                         )
                         or (
                             len(pokemon_evolution_names) > 2
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[2]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[2]
                         )
                         or (
                             len(pokemon_evolution_names) > 3
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[3]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[3]
                         )
                         or (
                             len(pokemon_evolution_names) > 4
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[4]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[4]
                         )
                         or (
                             len(pokemon_evolution_names) > 5
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[5]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[5]
                         )
                         or (
                             len(pokemon_evolution_names) > 6
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[6]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[6]
                         )
                         or (
                             len(pokemon_evolution_names) > 7
-                            and pvp_pokemon["Name"][1:] == pokemon_evolution_names[7]
+                            and pvp_pokemon["Name"] == pokemon_evolution_names[7]
                         )
                     )
                     and attack == pokemon["attack"]
                     and defence == pokemon["defence"]
                     and stamina == pokemon["stamina"]
+                    and pvp_pokemon["Galarian"] == pokemon_is_galarian(pokemon_name, pokemon_move_first)
+                    and pvp_pokemon["Alolan"] == pokemon_is_alolan(pokemon_name, pokemon_move_first)
                 ):
                     # Ahora puedes acceder a los valores de pvp_pokemon
                     pokemon_dict = {
@@ -300,9 +325,6 @@ def fetch_pvp_1500_pokemon_data():
                     pvp_pokemon_list.append(pokemon_dict)
     return pvp_pokemon_list
 
-
-def signature():
-    return "✍🏻•´¯•. ☆ Jσʂé Lυιʂ ☆ .•´¯•✍🏻"
 
 def generate_pvp_1500_pokemon_messages():
     """Retrieves Pokemon data, formats it into messages, and returns a list of formatted messages ready to be sent."""
