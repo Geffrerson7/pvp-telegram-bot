@@ -64,7 +64,7 @@ Once all of that is done, proceed to start the app
 Start sending PVP coordinates:
 
 ```bash
-  /pvp
+  /pvp1500
 ```
 
 Stop sending coordinates:
