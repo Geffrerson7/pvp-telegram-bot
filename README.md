@@ -70,3 +70,4 @@ Start sending PVP coordinates:
 Stop sending coordinates:
 ```bash
   /stop
+```
