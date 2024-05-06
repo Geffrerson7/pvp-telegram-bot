@@ -142,66 +142,60 @@ def calculate_remaining_time(despawn, delay):
 
 def retrieve_move_icon(move_type):
     """Returns an emoji representing the type of a Pokémon move."""
-    if move_type == "steel":
+    if move_type == "Acero":
         return "⚙️"
-    elif move_type == "water":
+    elif move_type == "Agua":
         return "💧"
-    elif move_type == "bug":
+    elif move_type == "Bicho":
         return "🐞"
-    elif move_type == "dragon":
+    elif move_type == "Dragón":
         return "🐲"
-    elif move_type == "electric":
+    elif move_type == "Eléctrico":
         return "⚡"
-    elif move_type == "ghost":
+    elif move_type == "Fantasma":
         return "👻"
-    elif move_type == "fire":
+    elif move_type == "Fuego":
         return "🔥"
-    elif move_type == "ice":
+    elif move_type == "Hielo":
         return "❄️"
-    elif move_type == "fairy":
+    elif move_type == "Hada":
         return "🌸"
-    elif move_type == "fighting":
+    elif move_type == "Lucha":
         return "🥊"
-    elif move_type == "normal":
+    elif move_type == "Normal":
         return "🔘"
-    elif move_type == "grass":
-        return "🍃"
-    elif move_type == "psychic":
+    elif move_type == "Planta":
+        return "🌿"
+    elif move_type == "Psíquico":
         return "🔮"
-    elif move_type == "rock":
+    elif move_type == "Roca":
         return "🪨"
-    elif move_type == "dark":
+    elif move_type == "Siniestro":
         return "☯️"
-    elif move_type == "ground":
+    elif move_type == "Tierra":
         return "⛰️"
-    elif move_type == "poison":
+    elif move_type == "Veneno":
         return "☠️"
-    elif move_type == "flying":
+    elif move_type == "Volador":
         return "🪽"
     else:
         return ""
 
 
-def retrieve_pokemon_move(pokemon_move_id):
+def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
     """Gets the move name of a Pokemon based on the move ID using the PokeAPI."""
-    try:
-        pokeapi_url = f"https://pokeapi.co/api/v2/move/{pokemon_move_id}"
-        response = requests.get(pokeapi_url)
-        response.raise_for_status()
-
-        data = response.json()
-        name = data["names"][5]["name"]
-        move_type = data["type"]["name"]
+        
+    with open("data/moves.json", "r") as file:
+        moves_data = json.load(file)
+    move = moves_data.get(str(pokemon_move_id))
+    if move:
+        move_name = move.get("name")
+        move_type = move.get("type")
         icon = retrieve_move_icon(move_type)
-        return {"name": name, "icon": icon}
-    except requests.exceptions.RequestException as e:
-        logging.warning(
-            f"Error fetching Pokemon move name for ID {pokemon_move_id}: {e}"
-        )
-    except ValueError as e:
-        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
-
-    return None
+        return {"name": move_name, "icon": icon}
+    else:
+        print(f"Pokemon:{pokemon_name}, move_id:{pokemon_move_id}")
+        return {"name": "", "icon": ""}
 
 
 def coordinates_waiting_time(coordinates_list_size):
