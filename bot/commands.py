@@ -90,7 +90,7 @@ async def start_pvp_1500(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         if job_start_pvp_1500:
             await update.message.reply_text(
-                "Las coordenadas de PVP se están enviando. Si desea detner el envío digite /stop"
+                "Las coordenadas de PVP se están enviando. Si desea detener el envío digite /stop"
             )
             return
         else:

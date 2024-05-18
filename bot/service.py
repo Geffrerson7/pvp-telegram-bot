@@ -1,7 +1,10 @@
-import requests, logging, re, time, json, datetime
+import requests, logging, re, time, json, datetime, traceback
+from typing import Dict, List, Union
+from math import floor
+from bot.constants import level_constants, pokedex, null_rank
 
 
-def retrieve_flag(url:str):
+def retrieve_flag(url: str):
     if url == "https://vanpokemap.com/query2.php":
         return "🇨🇦Vancouver, Canadá"
     elif url == "https://nycpokemap.com/query2.php":
@@ -184,7 +187,7 @@ def retrieve_move_icon(move_type):
 
 def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
     """Gets the move name of a Pokemon based on the move ID using the PokeAPI."""
-        
+
     with open("data/moves.json", "r") as file:
         moves_data = json.load(file)
     move = moves_data.get(str(pokemon_move_id))
@@ -241,82 +244,71 @@ def get_pokemon_evolutions(pokemon_name):
 
 
 def pokemon_is_galarian(pokemon_name: str, pokemon_move_1: str) -> bool:
-    
-    if pokemon_name == "Stunfisk" and (pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"):
+
+    if pokemon_name == "Stunfisk" and (
+        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"
+    ):
         return True
     return False
 
 
 def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
-    
-    if pokemon_name == "Rattata" and (pokemon_move_1 == "Ataque Rápido" or pokemon_move_1 == "Placaje"):
+
+    if pokemon_name == "Rattata" and (
+        pokemon_move_1 == "Ataque Rápido" or pokemon_move_1 == "Placaje"
+    ):
         return True
     return False
+
+
+def get_pokemon_by_name(pokedex, name):
+    for pokemon in pokedex:
+        if pokemon["name"].lower() == name.lower():
+            return pokemon
+    return None
 
 
 def fetch_pvp_1500_pokemon_data():
     """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
     pvp_pokemon_list = []
-    with open("data/pvp1500_data.json", "r") as file:
-        data = json.load(file)
-    for iv in range(100, 70, -10):
+
+    for iv in range(100, 80, -10):
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
-            pokemon_evolution_names = get_pokemon_evolutions(pokemon_name.lower())
-            pokemon_move_first = retrieve_pokemon_move(pokemon["move1"])
-            for pvp_pokemon in data:
-                iv = pvp_pokemon["IV"]
-                attack, defence, stamina = iv.split("/")
-                if (
-                    (
-                        pvp_pokemon["Name"] == pokemon_name
-                        or (
-                            len(pokemon_evolution_names) != 0
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[0]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 1
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[1]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 2
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[2]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 3
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[3]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 4
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[4]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 5
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[5]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 6
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[6]
-                        )
-                        or (
-                            len(pokemon_evolution_names) > 7
-                            and pvp_pokemon["Name"] == pokemon_evolution_names[7]
-                        )
-                    )
-                    and attack == pokemon["attack"]
-                    and defence == pokemon["defence"]
-                    and stamina == pokemon["stamina"]
-                    and pvp_pokemon["Galarian"] == pokemon_is_galarian(pokemon_name, pokemon_move_first)
-                    and pvp_pokemon["Alolan"] == pokemon_is_alolan(pokemon_name, pokemon_move_first)
-                ):
-                    # Ahora puedes acceder a los valores de pvp_pokemon
-                    pokemon_dict = {
+            # dict_pokemon_move = retrieve_pokemon_move(pokemon["move1"],pokemon_name)
+            # if pokemon_is_alolan(pokemon_name,dict_pokemon_move["name"]):
+            #     pokemon_name += " Alola"
+
+            # if pokemon_is_galarian(pokemon_name,dict_pokemon_move["name"]):
+            #     pokemon_name += " Galar"
+            pokedex_entry = get_pokemon_by_name(pokedex, pokemon_name)
+            if pokedex_entry == None:
+                pokedex_entry = {
+                    "number": str(pokemon["pokemon_id"]),
+                    "name": pokemon_name,
+                    "baseAttack": 0,
+                    "baseDefense": 0,
+                    "baseHealth": 0,
+                    "family": pokemon_name.lower(),
+                }
+            ranking_data = calculate_rank(
+                pokedex_entry,
+                pokemon["attack"],
+                pokemon["defence"],
+                pokemon["stamina"],
+                1500,
+            )
+            first_rank = ranking_data["rank"][0]
+
+            if pokemon["attack"] == first_rank["attackStat"] and pokemon["defence"] == first_rank["defenseStat"] and pokemon["stamina"] == first_rank["healthStat"]:
+                pokemon_dict = {
                         "pokemon": pokemon,
-                        "ranking": pvp_pokemon,
+                        "ranking": first_rank,
                         "iv": iv,
                     }
-                    pvp_pokemon_list.append(pokemon_dict)
+                pvp_pokemon_list.append(pokemon_dict)
+
     return pvp_pokemon_list
 
 
@@ -334,54 +326,189 @@ def generate_pvp_1500_pokemon_messages():
                     + message_delay * total_data.index(data)
                 )
                 dsp = calculate_remaining_time(data["pokemon"]["despawn"], delay)
-                pokemon_name = escape_string(
+                if dsp:
+                    pokemon_name = escape_string(
                     retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
                 )
-                iv_number = data["iv"]
-                cp = data["pokemon"]["cp"]
-                level = data["pokemon"]["level"]
-                shiny_icon = "✨" if data["pokemon"]["shiny"] == 0 else ""
-                latitude = data["pokemon"]["lat"]
-                longitude = data["pokemon"]["lng"]
-                flag = data["pokemon"]["flag"]
-                move1 = escape_string(
-                    retrieve_pokemon_move(data["pokemon"]["move1"])["name"]
+                    iv_number = data["iv"]
+                    cp = data["pokemon"]["cp"]
+                    level = data["pokemon"]["level"]
+                    shiny_icon = "✨" if data["pokemon"]["shiny"] == 0 else ""
+                    latitude = data["pokemon"]["lat"]
+                    longitude = data["pokemon"]["lng"]
+                    flag = data["pokemon"]["flag"]
+                    move1 = escape_string(
+                    retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)["name"]
                 )
-                move2 = escape_string(
-                    retrieve_pokemon_move(data["pokemon"]["move2"])["name"]
+                    move2 = escape_string(
+                    retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)["name"]
                 )
-                move1_icon = retrieve_pokemon_move(data["pokemon"]["move1"])["icon"]
-                move2_icon = retrieve_pokemon_move(data["pokemon"]["move2"])["icon"]
-                height = escape_string(
+                    move1_icon = retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)["icon"]
+                    move2_icon = retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)["icon"]
+                    height = escape_string(
                     retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
                 )
-                weight = escape_string(
+                    weight = escape_string(
                     retrieve_pokemon_weight(data["pokemon"]["pokemon_id"])
                 )
-                ranking_pvp_pokemon = data["ranking"]["#"]
-                name_pvp_pokemon = data["ranking"]["Name"]
-                cp_pvp_pokemon = data["ranking"]["CP"]
-                level_pvp_pokemon = escape_string(data["ranking"]["Level"])
-                pvp_signature = escape_string(signature())
-                gender_icon = "♂️" if data["pokemon"]["gender"] == 1 else "♀️"
-                formatted_message = (
+                    pokemon_id = data["pokemon"]["pokemon_id"]
+                    cp_pvp_pokemon = data["ranking"]["cp"]
+                    level_pvp_pokemon = escape_string(str(data["ranking"]["level"]))
+                    gender_icon = "♂️" if data["pokemon"]["gender"] == 1 else "♀️"
+                    formatted_message = (
                     f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
                     f"IV:{iv_number} CP:{cp} LV:{level}\n"
                     f"⚖️{weight}kg 📏{height}m\n"
                     f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
                     f"                     ▼\n"
-                    f"\#0{ranking_pvp_pokemon} \- *{name_pvp_pokemon}* 🅶🅻\n"
+                    f"\#0{pokemon_id} \- *{pokemon_name}* 🅶🅻\n"
                     f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
-                    f"🌀🏅🄰🄴 ᴇʟᴇᴍᴇɴᴛs ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
-                    f"      ˢⁿⁱᵖᵉʳ 🄰🄴 ᵉˡᵉᵐᵉⁿᵗˢ\n"
-                    f" {pvp_signature}\n"
+                    f"☄️🥊🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
                     f"{flag}\n"
                     f"`{latitude},{longitude}`"
                 )
-                total_message.append(formatted_message)
+                    total_message.append(formatted_message)
         else:
             logging.error("Pokemons not found")
     except Exception as e:
         logging.error(f"Error sending Pokemon data: {e}")
         return None
     return total_message
+
+
+def calculate_cp(attack, defense, health, level_constant):
+    try:
+        value = attack * (defense * health) ** 0.5 * level_constant**2
+        return 10 if value < 100 else int(value / 10)
+    except Exception as e:
+        # Handle the error appropriately
+        print(f"An error occurred while calculating CP: {e}")
+        return None
+
+
+def calculate_products(
+    pokedex_entry: Dict[str, int],
+    attack_stat: int,
+    defense_stat: int,
+    health_stat: int,
+    level_constant: int,
+) -> Dict[str, int]:
+    try:
+        base_attack = pokedex_entry["baseAttack"]
+        base_defense = pokedex_entry["baseDefense"]
+        base_health = pokedex_entry["baseHealth"]
+
+        attack_product = (base_attack + attack_stat) * level_constant
+        defense_product = (base_defense + defense_stat) * level_constant
+        health_product = floor((base_health + health_stat) * level_constant)
+        product = attack_product * defense_product * health_product
+
+        cp = calculate_cp(
+            base_attack + attack_stat,
+            base_defense + defense_stat,
+            base_health + health_stat,
+            level_constant,
+        )
+
+        return {
+            "attackProduct": attack_product,
+            "defenseProduct": defense_product,
+            "healthProduct": health_product,
+            "product": product,
+            "cp": cp,
+        }
+    except KeyError as e:
+        # Handle the KeyError (missing key in pokedex_entry)
+        print(f"KeyError: {e} not found in pokedex_entry")
+        return None
+    except Exception as e:
+        # Handle other exceptions
+        print(f"An error occurred while calculating products: {e}")
+        return None
+
+
+def level_to_index(level_request: Dict[str, int]) -> int:
+    return (level_request["level"] - 1) * 2
+
+
+def index_to_level(index_request: Dict[str, int]) -> int:
+    return index_request["index"] / 2 + 1
+
+
+def build_rank(
+    pokedex_entry: Dict[str, int], max_cp: int, max_level: int = 40, min_stat: int = 0
+) -> List[Dict[str, int]]:
+    try:
+        rank_entries = []
+        for attack_stat in range(15, min_stat - 1, -1):
+            for defense_stat in range(15, min_stat - 1, -1):
+                for health_stat in range(15, min_stat - 1, -1):
+                    initial_index = level_to_index({"level": max_level})
+                    for level_index in range(initial_index, -1, -1):
+                        products = calculate_products(
+                            pokedex_entry,
+                            attack_stat,
+                            defense_stat,
+                            health_stat,
+                            level_constants[level_index],
+                        )
+                        if products["cp"] <= max_cp:
+                            rank_entries.append(
+                                {
+                                    "attackStat": attack_stat,
+                                    "defenseStat": defense_stat,
+                                    "healthStat": health_stat,
+                                    "level": index_to_level({"index": level_index}),
+                                    **products,
+                                }
+                            )
+                            break
+
+        rank_sorted = sorted(rank_entries, key=lambda x: x["product"], reverse=True)
+
+        return [{"rank": index + 1, **data} for index, data in enumerate(rank_sorted)]
+    except Exception as e:
+        # Handle exceptions if any
+        print(f"An error occurred while building rank: {e}")
+        return []
+
+
+def calculate_rank(
+    pokedex_entry: Dict[str, int],
+    ref_attack_stat: int,
+    ref_defense_stat: int,
+    ref_health_stat: int,
+    max_cp: int,
+    max_level: int = 40,
+    minimum_stat_value: int = 0,
+) -> Dict[
+    str,
+    Union[List[Dict[str, int]], Dict[str, Union[Dict[str, int], List[Dict[str, int]]]]],
+]:
+    try:
+        rank = build_rank(pokedex_entry, max_cp, max_level, minimum_stat_value)
+
+        occurence = next(
+            (
+                el
+                for el in rank
+                if el["attackStat"] == ref_attack_stat
+                and el["defenseStat"] == ref_defense_stat
+                and el["healthStat"] == ref_health_stat
+            ),
+            None,
+        )
+        if not occurence:
+            return {"occurence": None, "rank": null_rank}
+
+        return {"occurence": occurence, "rank": rank}
+    except ValueError as ve:
+        # Handle specific exceptions
+        print(f"ValueError: {ve}")
+        return {"occurence": None, "rank": null_rank}
+    except Exception as e:
+        # Handle other exceptions
+        print(f"An error occurred while calculating rank: {e}")
+        return {"occurence": None, "rank": null_rank}
+
+
