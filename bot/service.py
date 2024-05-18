@@ -1,7 +1,13 @@
-import requests, logging, re, time, json, datetime, traceback
+import requests, logging, re, time, json, datetime
 from typing import Dict, List, Union
 from math import floor
-from bot.constants import level_constants, pokedex, null_rank
+from bot.constants import (
+    level_constants,
+    pokedex,
+    null_rank,
+    CUMULATIVE_STARDUST,
+    CUMULATIVE_CANDY,
+)
 
 
 def retrieve_flag(url: str):
@@ -268,6 +274,13 @@ def get_pokemon_by_name(pokedex, name):
     return None
 
 
+def calculate_cost(start_lvl, end_lvl):
+    stardust = CUMULATIVE_STARDUST[end_lvl] - CUMULATIVE_STARDUST[start_lvl]
+    candy = CUMULATIVE_CANDY[end_lvl] - CUMULATIVE_CANDY[start_lvl]
+
+    return {"stardust": stardust, "candy": candy}
+
+
 def fetch_pvp_1500_pokemon_data():
     """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
     pvp_pokemon_list = []
@@ -301,12 +314,16 @@ def fetch_pvp_1500_pokemon_data():
             )
             first_rank = ranking_data["rank"][0]
 
-            if pokemon["attack"] == first_rank["attackStat"] and pokemon["defence"] == first_rank["defenseStat"] and pokemon["stamina"] == first_rank["healthStat"]:
+            if (
+                pokemon["attack"] == first_rank["attackStat"]
+                and pokemon["defence"] == first_rank["defenseStat"]
+                and pokemon["stamina"] == first_rank["healthStat"]
+            ):
                 pokemon_dict = {
-                        "pokemon": pokemon,
-                        "ranking": first_rank,
-                        "iv": iv,
-                    }
+                    "pokemon": pokemon,
+                    "ranking": first_rank,
+                    "iv": iv,
+                }
                 pvp_pokemon_list.append(pokemon_dict)
 
     return pvp_pokemon_list
@@ -328,8 +345,8 @@ def generate_pvp_1500_pokemon_messages():
                 dsp = calculate_remaining_time(data["pokemon"]["despawn"], delay)
                 if dsp:
                     pokemon_name = escape_string(
-                    retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
-                )
+                        retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
+                    )
                     iv_number = data["iv"]
                     cp = data["pokemon"]["cp"]
                     level = data["pokemon"]["level"]
@@ -338,35 +355,51 @@ def generate_pvp_1500_pokemon_messages():
                     longitude = data["pokemon"]["lng"]
                     flag = data["pokemon"]["flag"]
                     move1 = escape_string(
-                    retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)["name"]
-                )
+                        retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)[
+                            "name"
+                        ]
+                    )
                     move2 = escape_string(
-                    retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)["name"]
-                )
-                    move1_icon = retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)["icon"]
-                    move2_icon = retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)["icon"]
+                        retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)[
+                            "name"
+                        ]
+                    )
+                    move1_icon = retrieve_pokemon_move(
+                        data["pokemon"]["move1"], pokemon_name
+                    )["icon"]
+                    move2_icon = retrieve_pokemon_move(
+                        data["pokemon"]["move2"], pokemon_name
+                    )["icon"]
                     height = escape_string(
-                    retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
-                )
+                        retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
+                    )
                     weight = escape_string(
-                    retrieve_pokemon_weight(data["pokemon"]["pokemon_id"])
-                )
+                        retrieve_pokemon_weight(data["pokemon"]["pokemon_id"])
+                    )
                     pokemon_id = data["pokemon"]["pokemon_id"]
                     cp_pvp_pokemon = data["ranking"]["cp"]
                     level_pvp_pokemon = escape_string(str(data["ranking"]["level"]))
                     gender_icon = "♂️" if data["pokemon"]["gender"] == 1 else "♀️"
+                    candy = calculate_cost(
+                        data["pokemon"]["level"], data["ranking"]["level"]
+                    )["candy"]
+                    stardust = calculate_cost(
+                        data["pokemon"]["level"], data["ranking"]["level"]
+                    )["stardust"]
+
                     formatted_message = (
-                    f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
-                    f"IV:{iv_number} CP:{cp} LV:{level}\n"
-                    f"⚖️{weight}kg 📏{height}m\n"
-                    f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
-                    f"                     ▼\n"
-                    f"\#0{pokemon_id} \- *{pokemon_name}* 🅶🅻\n"
-                    f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
-                    f"☄️🥊🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
-                    f"{flag}\n"
-                    f"`{latitude},{longitude}`"
-                )
+                        f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
+                        f"IV:{iv_number} CP:{cp} LV:{level}\n"
+                        f"⚖️{weight}kg 📏{height}m\n"
+                        f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
+                        f"                     ▼\n"
+                        f"\#0{pokemon_id} \- *{pokemon_name}* 🅶🅻\n"
+                        f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
+                        f"⚗️{stardust} 🍬{candy}\n"
+                        f"☄️🥊🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
+                        f"{flag}\n"
+                        f"`{latitude},{longitude}`"
+                    )
                     total_message.append(formatted_message)
         else:
             logging.error("Pokemons not found")
@@ -510,5 +543,3 @@ def calculate_rank(
         # Handle other exceptions
         print(f"An error occurred while calculating rank: {e}")
         return {"occurence": None, "rank": null_rank}
-
-
