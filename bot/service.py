@@ -312,7 +312,7 @@ def fetch_pvp_1500_pokemon_data():
                 pokemon["stamina"],
                 1500,
             )
-            first_rank = ranking_data["rank"][0]
+            first_rank = ranking_data["rank"]
 
             if (
                 pokemon["attack"] == first_rank["attackStat"]
@@ -499,11 +499,17 @@ def build_rank(
 
         rank_sorted = sorted(rank_entries, key=lambda x: x["product"], reverse=True)
 
-        return [{"rank": index + 1, **data} for index, data in enumerate(rank_sorted)]
+        # return [{"rank": index + 1, **data} for index, data in enumerate(rank_sorted)]
+        if rank_sorted:
+            best_rank_entry = rank_sorted[0]
+            best_rank_entry["rank"] = 1
+            return best_rank_entry
+        else:
+            return {}
     except Exception as e:
         # Handle exceptions if any
         print(f"An error occurred while building rank: {e}")
-        return []
+        return {}
 
 
 def calculate_rank(
@@ -520,26 +526,22 @@ def calculate_rank(
 ]:
     try:
         rank = build_rank(pokedex_entry, max_cp, max_level, minimum_stat_value)
-
-        occurence = next(
-            (
-                el
-                for el in rank
-                if el["attackStat"] == ref_attack_stat
-                and el["defenseStat"] == ref_defense_stat
-                and el["healthStat"] == ref_health_stat
-            ),
-            None,
-        )
-        if not occurence:
-            return {"occurence": None, "rank": null_rank}
-
-        return {"occurence": occurence, "rank": rank}
+        # occurence = next(
+        #     (
+        #         el
+        #         for el in rank
+        #         if el["attackStat"] == ref_attack_stat
+        #         and el["defenseStat"] == ref_defense_stat
+        #         and el["healthStat"] == ref_health_stat
+        #     ),
+        #     None,
+        # )
+        return {"rank": rank}
     except ValueError as ve:
         # Handle specific exceptions
         print(f"ValueError: {ve}")
-        return {"occurence": None, "rank": null_rank}
+        return {"rank": null_rank}
     except Exception as e:
         # Handle other exceptions
         print(f"An error occurred while calculating rank: {e}")
-        return {"occurence": None, "rank": null_rank}
+        return {"rank": null_rank}
