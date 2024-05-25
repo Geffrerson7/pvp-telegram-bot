@@ -217,11 +217,6 @@ def escape_string(input_string):
     return re.sub(r"[-.]", lambda x: "\\" + x.group(), input_string)
 
 
-def signature():
-    """Return admin siganture"""
-    return "✍🏻•´¯•. ☆ Jσʂé Lυιʂ ☆ .•´¯•✍🏻"
-
-
 def get_pokemon_evolutions(pokemon_name):
     """Retrieves the evolution chain for a given Pokemon name."""
     for i in range(1, 542):
@@ -251,6 +246,66 @@ def get_pokemon_evolutions(pokemon_name):
 
 def pokemon_is_galarian(pokemon_name: str, pokemon_move_1: str) -> bool:
 
+    if pokemon_name == "Stunfisk" and (
+        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"
+    ):
+        return True
+    if pokemon_name == "Meowth" and (
+        pokemon_move_1 == "Arañazo" or pokemon_move_1 == "Garra Metal"
+    ):
+        return True
+    if pokemon_name == "Ponyta" and (
+        pokemon_move_1 == "Patada Baja" or pokemon_move_1 == "Psicocorte"
+    ):
+        return True
+    if pokemon_name == "Rapidash" and (
+        pokemon_move_1 == "Patada Baja"
+        or pokemon_move_1 == "Psicocorte"
+        or pokemon_move_1 == "Viento Feérico"
+    ):
+        return True
+    if pokemon_name == "Slowpoke" and (
+        pokemon_move_1 == "Confusión" or pokemon_move_1 == "Cola Férrea"
+    ):
+        return True
+    if pokemon_name == "Slowbro" and (
+        pokemon_move_1 == "Pistola Agua" or pokemon_move_1 == "Confusión"
+    ):
+        return True
+    if pokemon_name == "Farfetch'd" and (
+        pokemon_move_1 == "Corte Furia" or pokemon_move_1 == "Golpe Roca"
+    ):
+        return True
+    if pokemon_name == "Weezing" and (
+        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Viento Feérico"
+    ):
+        return True
+    if pokemon_name == "Mr-Mime" and (
+        pokemon_move_1 == "Cabezazo Zen" or pokemon_move_1 == "Confusión"
+    ):
+        return True
+    if pokemon_name == "Slowking" and (
+        pokemon_move_1 == "Ácido" or pokemon_move_1 == "Confusión" or pokemon_move_1 == "Infortunio"
+    ):
+        return True
+    if pokemon_name == "Zigzagoon" and (
+        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Derribo"
+    ):
+        return True
+    if pokemon_name == "Linoone" and (
+        pokemon_move_1 == "Lengüetazo" or pokemon_move_1 == "Alarido"
+    ):
+        return True
+    if pokemon_name == "Darumaka" and (
+        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Colmillo Hielo"
+    ):
+        return True
+    if pokemon_name == "Darmitan" and (
+        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Colmillo Hielo"
+    ):
+        return True
+    if pokemon_name == "Yamask" and pokemon_move_1 == "Impresionar":
+        return True
     if pokemon_name == "Stunfisk" and (
         pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"
     ):
@@ -289,12 +344,15 @@ def fetch_pvp_1500_pokemon_data():
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
-            # dict_pokemon_move = retrieve_pokemon_move(pokemon["move1"],pokemon_name)
-            # if pokemon_is_alolan(pokemon_name,dict_pokemon_move["name"]):
-            #     pokemon_name += " Alola"
+            dict_pokemon_move = retrieve_pokemon_move(pokemon["move1"], pokemon_name)
+            if pokemon_is_alolan(pokemon_name, dict_pokemon_move["name"]):
+                pokemon_name += " Alola"
 
-            # if pokemon_is_galarian(pokemon_name,dict_pokemon_move["name"]):
-            #     pokemon_name += " Galar"
+            if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
+                if pokemon_name == "Mr-Mime":
+                    pokemon_name = pokemon_name.replace("-",". ") + " Galar"
+                pokemon_name += " Galar"
+                
             pokedex_entry = get_pokemon_by_name(pokedex, pokemon_name)
             if pokedex_entry == None:
                 pokedex_entry = {
