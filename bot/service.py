@@ -1,7 +1,7 @@
 import requests, logging, re, time, json, datetime
 from typing import Dict, List, Union
 from math import floor
-from bot.constants import (
+from constants import (
     level_constants,
     pokedex,
     null_rank,
@@ -194,7 +194,7 @@ def retrieve_move_icon(move_type):
 def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
     """Gets the move name of a Pokemon based on the move ID using the PokeAPI."""
 
-    with open("data/moves.json", "r") as file:
+    with open("../data/moves.json", "r") as file:
         moves_data = json.load(file)
     move = moves_data.get(str(pokemon_move_id))
     if move:
@@ -319,6 +319,74 @@ def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
         pokemon_move_1 == "Ataque Rápido" or pokemon_move_1 == "Placaje"
     ):
         return True
+    if pokemon_name == "Raticate" and (
+        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Ataque Rápido"
+    ):
+        return True
+    if pokemon_name == "Raichu" and (
+        pokemon_move_1 == "Impactrueno" or pokemon_move_1 == "Chispa" or pokemon_move_1 == "Voltiocambio"
+    ):
+        return True
+    if pokemon_name == "Sandshrew" and (
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Nieve Polvo" 
+    ):
+        return True
+    if pokemon_name == "Sandslash" and (
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Nieve Polvo" or pokemon_move_1 == "Garra Umbría"
+    ):
+        return True
+    if pokemon_name == "Vulpix" and (
+        pokemon_move_1 == "Cabezazo Zen" or pokemon_move_1 == "Nieve Polvo" 
+    ):
+        return True
+    if pokemon_name == "Ninetales" and (
+        pokemon_move_1 == "Finta" or pokemon_move_1 == "Nieve Polvo" or pokemon_move_1 == "Encanto"
+    ):
+        return True
+    if pokemon_name == "Diglett" and (
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Bofetón Lodo" or pokemon_move_1 == "Ataque Arena"
+    ):
+        return True
+    if pokemon_name == "Dugtrio" and (
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Bofetón Lodo" or pokemon_move_1 == "Ataque Arena"
+    ):
+        return True
+    if pokemon_name == "Meowth" and (
+        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Arañazo"
+    ):
+        return True
+    if pokemon_name == "Persian" and (
+        pokemon_move_1 == "Arañazo" or pokemon_move_1 == "Finta"
+    ):
+        return True
+    if pokemon_name == "Geodude" and (
+        pokemon_move_1 == "Lanzarrocas" or pokemon_move_1 == "Voltiocambio"
+    ):
+        return True
+    if pokemon_name == "Graveler" and (
+        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Lanzarrocas" or pokemon_move_1 == "Bofetón Lodo"
+    ):
+        return True
+    if pokemon_name == "Golem" and (
+        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Lanzarrocas" or pokemon_move_1 == "Bofetón Lodo"
+    ):
+        return True
+    if pokemon_name == "Grimer" and (
+        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Puya Nociva" 
+    ):
+        return True
+    if pokemon_name == "Muk" and (
+        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Puya Nociva" or pokemon_move_1 == "Alarido"
+    ):
+        return True
+    if pokemon_name == "Exeggutor" and (
+        pokemon_move_1 == "Cola Dragón" or pokemon_move_1 == "Semilladora" 
+    ):
+        return True
+    if pokemon_name == "Marowak" and (
+        pokemon_move_1 == "Golpe Roca" or pokemon_move_1 == "Infortunio" or pokemon_move_1 == "Giro Fuego"
+    ):
+        return True
     return False
 
 
@@ -392,6 +460,7 @@ def generate_pvp_1500_pokemon_messages():
     try:
         total_message = []
         total_data = fetch_pvp_1500_pokemon_data()
+        print(f"Numero de pokes: {len(total_data)}")
         if total_data != []:
             message_delay = 3 if len(total_data) > 18 else 2
             for data in total_data:
