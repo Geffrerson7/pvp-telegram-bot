@@ -2,7 +2,6 @@ from telegram import Update
 from telegram.ext import (
     ContextTypes,
 )
-from telegram import ReplyKeyboardMarkup
 from settings import config
 import traceback
 import html
@@ -47,14 +46,11 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text = f"¡Hola {user_name}, bienvenido a Adventure Elements!\n"
     message_text += "Este es un menú explicativo:\n\n"
     message_text += "/pvp1500 - Inicia el envío de coordenadas PVP 1500.\n"
+    message_text += "/pvp2500 - Inicia el envío de coordenadas PVP 2500.\n"
+    message_text += "/pvp_master - Inicia el envío de coordenadas PVP Master League.\n"
     message_text += "/stop - Detiene el envío de  PVP.\n"
 
-    keyboard = [["/pvp1500", "/stop"]]
-    reply_markup = ReplyKeyboardMarkup(
-        keyboard, one_time_keyboard=True, resize_keyboard=True
-    )
-
-    await update.message.reply_text(message_text, reply_markup=reply_markup)
+    await update.message.reply_text(message_text)
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -97,5 +93,7 @@ async def unknown_command(update, context):
     message_text = f"Lo siento, el comando ingresado no es válido.\n"
     message_text += "Esta es la lista de comandos válidos:\n\n"
     message_text += "/pvp1500 - Inicia el envío de coordenadas PVP 1500.\n"
+    message_text += "/pvp2500 - Inicia el envío de coordenadas PVP 2500.\n"
+    message_text += "/pvp_master - Inicia el envío de coordenadas PVP Master League.\n"
     message_text += "/stop - Detiene el envío de  PVP.\n"
     await update.message.reply_text(message_text)

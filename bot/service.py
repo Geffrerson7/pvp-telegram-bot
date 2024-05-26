@@ -1,7 +1,7 @@
 import requests, logging, re, time, json, datetime
 from typing import Dict, List, Union
 from math import floor
-from constants import (
+from bot.constants import (
     level_constants,
     pokedex,
     null_rank,
@@ -194,7 +194,7 @@ def retrieve_move_icon(move_type):
 def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
     """Gets the move name of a Pokemon based on the move ID using the PokeAPI."""
 
-    with open("../data/moves.json", "r") as file:
+    with open("./data/moves.json", "r") as file:
         moves_data = json.load(file)
     move = moves_data.get(str(pokemon_move_id))
     if move:
@@ -209,39 +209,12 @@ def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
 
 def coordinates_waiting_time(coordinates_list_size):
     """Obtains the excecution time of fetch_pokemon_data() function"""
-    return 1.0969 * coordinates_list_size + 4.0994
+    return 1.9967 * coordinates_list_size + 131.05
 
 
 def escape_string(input_string):
     """Replaces characters '-' with '\-', and characters '.' with '\.'"""
     return re.sub(r"[-.]", lambda x: "\\" + x.group(), input_string)
-
-
-def get_pokemon_evolutions(pokemon_name):
-    """Retrieves the evolution chain for a given Pokemon name."""
-    for i in range(1, 542):
-        evolution_chain_url = f"https://pokeapi.co/api/v2/evolution-chain/{i}"
-        response = requests.get(evolution_chain_url)
-        if response.status_code == 200:
-            evolution_names = []
-            evolution_data = response.json()
-            chain = evolution_data.get("chain", {})
-            species_name = chain.get("species", {}).get("name", "")
-            if species_name == pokemon_name and len(chain["evolves_to"]) == 1:
-                current_evolution = chain
-                while current_evolution:
-                    species_name = current_evolution["species"]["name"]
-                    evolution_names.append(species_name)
-                    current_evolution = current_evolution.get("evolves_to", [])
-                    if current_evolution:
-                        current_evolution = current_evolution[0]
-                return evolution_names[1:]
-            elif species_name == pokemon_name and len(chain["evolves_to"]) > 1:
-                for evolution in chain["evolves_to"]:
-                    species_name_2 = evolution["species"]["name"]
-                    evolution_names.append(species_name_2)
-                return evolution_names
-    return None
 
 
 def pokemon_is_galarian(pokemon_name: str, pokemon_move_1: str) -> bool:
@@ -404,7 +377,7 @@ def calculate_cost(start_lvl, end_lvl):
     return {"stardust": stardust, "candy": candy}
 
 
-def fetch_pvp_1500_pokemon_data():
+def fetch_pvp_pokemon_data(max_cp:int):
     """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
     pvp_pokemon_list = []
 
@@ -436,7 +409,7 @@ def fetch_pvp_1500_pokemon_data():
                 pokemon["attack"],
                 pokemon["defence"],
                 pokemon["stamina"],
-                1500,
+                max_cp,
             )
             first_rank = ranking_data["rank"]
 
@@ -455,12 +428,20 @@ def fetch_pvp_1500_pokemon_data():
     return pvp_pokemon_list
 
 
-def generate_pvp_1500_pokemon_messages():
+def signature(max_cp:int):
+    if max_cp == 1500:
+        return "🆂🅻"
+    elif max_cp == 2500:
+        return "🆄🅻"
+    else:
+        return "🅼🅻"
+    
+
+def generate_pvp_pokemon_messages(max_cp:int):
     """Retrieves Pokemon data, formats it into messages, and returns a list of formatted messages ready to be sent."""
     try:
         total_message = []
-        total_data = fetch_pvp_1500_pokemon_data()
-        print(f"Numero de pokes: {len(total_data)}")
+        total_data = fetch_pvp_pokemon_data(max_cp)
         if total_data != []:
             message_delay = 3 if len(total_data) > 18 else 2
             for data in total_data:
