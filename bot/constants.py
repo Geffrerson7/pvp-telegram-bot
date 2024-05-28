@@ -425,7 +425,7 @@ pokedex = [
     },
     {
         "number": "029",
-        "name": "Nidoran Female",
+        "name": "Nidoran-F",
         "baseAttack": 86,
         "baseDefense": 89,
         "baseHealth": 146,
@@ -449,7 +449,7 @@ pokedex = [
     },
     {
         "number": "032",
-        "name": "Nidoran Male",
+        "name": "Nidoran-M",
         "baseAttack": 105,
         "baseDefense": 76,
         "baseHealth": 130,
@@ -1361,7 +1361,7 @@ pokedex = [
     },
     {
         "number": "122",
-        "name": "Mr. Mime",
+        "name": "Mr-Mime",
         "baseAttack": 192,
         "baseDefense": 205,
         "baseHealth": 120,
@@ -1369,7 +1369,7 @@ pokedex = [
     },
     {
         "number": "122",
-        "name": "Mr. Mime Galar",
+        "name": "Mr-Mime Galar",
         "baseAttack": 183,
         "baseDefense": 169,
         "baseHealth": 137,
@@ -5025,7 +5025,23 @@ pokedex = [
     },
     {
         "number": "550",
-        "name": "Basculin",
+        "name": "Basculin-Red-Striped",
+        "baseAttack": 189,
+        "baseDefense": 129,
+        "baseHealth": 172,
+        "family": "basculin",
+    },
+    {
+        "number": "550",
+        "name": "Basculin-Blue-Striped",
+        "baseAttack": 189,
+        "baseDefense": 129,
+        "baseHealth": 172,
+        "family": "basculin",
+    },
+    {
+        "number": "550",
+        "name": "Basculin-White-Striped",
         "baseAttack": 189,
         "baseDefense": 129,
         "baseHealth": 172,
@@ -6718,6 +6734,14 @@ pokedex = [
         "baseDefense": 138,
         "baseHealth": 219,
         "family": "crabrawler",
+    },
+    {
+        "number": "741",
+        "name": "Oricorio-Baile",
+        "baseAttack": 196,
+        "baseDefense": 145,
+        "baseHealth": 181,
+        "family": "oricorio",
     },
     {
         "number": "742",
