@@ -390,8 +390,6 @@ def fetch_pvp_pokemon_data(max_cp:int):
                 pokemon_name += " Alola"
 
             if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
-                if pokemon_name == "Mr-Mime":
-                    pokemon_name = pokemon_name.replace("-",". ") + " Galar"
                 pokemon_name += " Galar"
                 
             pokedex_entry = get_pokemon_by_name(pokedex, pokemon_name)
@@ -428,9 +426,9 @@ def fetch_pvp_pokemon_data(max_cp:int):
     return pvp_pokemon_list
 
 
-def signature(max_cp:int):
+def league_signature(max_cp:int):
     if max_cp == 1500:
-        return "🆂🅻"
+        return "🅶🅻"
     elif max_cp == 2500:
         return "🆄🅻"
     else:
@@ -494,14 +492,14 @@ def generate_pvp_pokemon_messages(max_cp:int):
                     stardust = calculate_cost(
                         data["pokemon"]["level"], data["ranking"]["level"]
                     )["stardust"]
-
+                    league = league_signature(max_cp)
                     formatted_message = (
                         f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
                         f"IV:{iv_number} CP:{cp} LV:{level}\n"
                         f"⚖️{weight}kg 📏{height}m\n"
                         f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
                         f"                     ▼\n"
-                        f"\#0{pokemon_id} \- *{pokemon_name}* 🅶🅻\n"
+                        f"\#0{pokemon_id} \- *{pokemon_name}* {league}\n"
                         f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
                         f"⚗️{stardust} 🍬{candy}\n"
                         f"☄️🥊🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
