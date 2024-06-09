@@ -25,7 +25,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Verificar si el mensaje proviene del grupo permitido
     if update.effective_chat.id != GRUPO_COORDENADAS_ID:
         await update.message.reply_text(
-            "Los comandos solo pueden ser activados en el grupo de @top100galaxy1"
+            "Los comandos solo pueden ser activados en el grupo de @aepvptopgalaxy"
         )
         return
 
