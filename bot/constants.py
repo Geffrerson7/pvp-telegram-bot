@@ -8336,7 +8336,7 @@ pokedex = [
         "family": "fidough",
     },
     {
-        "number": "928 ",
+        "number": "928",
         "name": "Smoliv",
         "baseAttack": 100,
         "baseDefense": 89,
