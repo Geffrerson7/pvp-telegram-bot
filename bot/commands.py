@@ -135,7 +135,7 @@ async def start_pvp_1500(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Verificar si el mensaje proviene del grupo de coordenadas
         if update.effective_chat.id != GRUPO_COORDENADAS_ID:
             await update.message.reply_text(
-                "Los comandos solo pueden ser activados en el grupo de @top100galaxy1"
+                "Los comandos solo pueden ser activados en el grupo de @aepvptopgalaxy"
             )
             return
 
@@ -178,7 +178,7 @@ async def start_pvp_2500(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Verificar si el mensaje proviene del grupo de coordenadas
         if update.effective_chat.id != GRUPO_COORDENADAS_ID:
             await update.message.reply_text(
-                "Los comandos solo pueden ser activados en el grupo de @top100galaxy1"
+                "Los comandos solo pueden ser activados en el grupo de @aepvptopgalaxy"
             )
             return
 
@@ -221,7 +221,7 @@ async def start_pvp_master_league(update: Update, context: ContextTypes.DEFAULT_
         # Verificar si el mensaje proviene del grupo de coordenadas
         if update.effective_chat.id != GRUPO_COORDENADAS_ID:
             await update.message.reply_text(
-                "Los comandos solo pueden ser activados en el grupo de @top100galaxy1"
+                "Los comandos solo pueden ser activados en el grupo de @aepvptopgalaxy"
             )
             return
 
@@ -264,7 +264,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         # Verificar si el mensaje proviene del grupo de coordenadas
         if update.effective_chat.id != GRUPO_COORDENADAS_ID:
             await update.message.reply_text(
-                "Los comandos solo pueden ser activados en el grupo de @top100galaxy1"
+                "Los comandos solo pueden ser activados en el grupo de @aepvptopgalaxy"
             )
             return
 
