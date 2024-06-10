@@ -392,24 +392,13 @@ def fetch_pvp_pokemon_data(max_cp:int):
             if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
                 pokemon_name += " Galar"
                 
-            pokedex_entry = get_pokemon_by_name(pokedex, pokemon_name)
-            if pokedex_entry == None:
-                pokedex_entry = {
-                    "number": str(pokemon["pokemon_id"]),
-                    "name": pokemon_name,
-                    "baseAttack": 0,
-                    "baseDefense": 0,
-                    "baseHealth": 0,
-                    "family": pokemon_name.lower(),
-                }
-            ranking_data = calculate_rank(
-                pokedex_entry,
-                pokemon["attack"],
-                pokemon["defence"],
-                pokemon["stamina"],
-                max_cp,
-            )
-            first_rank = ranking_data["rank"]
+            with open(f"./data/lista_ranking_{max_cp}.json", "r") as file:
+                rankings_data = json.load(file)
+                
+            for ranking_data in rankings_data:
+                if ranking_data["name"] == pokemon_name:
+                    first_rank = ranking_data
+                    break
 
             if (
                 pokemon["attack"] == first_rank["attackStat"]
