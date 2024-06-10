@@ -4,17 +4,17 @@ from bot.service import (
 )
 from telegram import Update
 from telegram.ext import ContextTypes
-from settings import config
+from settings.config import CHAT_ID, SUPPORT, ADMIN, USER_1, USER_2, PERIOD
 import telegram
 from typing import List
 
 # ID del grupo al que se enviarán las coordenadas
-GRUPO_COORDENADAS_ID = int(config.CHAT_ID)
+GRUPO_COORDENADAS_ID = int(CHAT_ID)
 
 # Lista de usuarios permitidos para activar los comandos
-USUARIOS_PERMITIDOS = [int(config.SUPPORT), int(config.ADMIN)]
+USUARIOS_PERMITIDOS = [int(SUPPORT), int(ADMIN), int(USER_1), int(USER_2)]
 
-PERIOD = int(config.PERIOD)
+PERIOD = int(PERIOD)
 
 
 async def send_coordinates(
