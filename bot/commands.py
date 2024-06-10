@@ -4,7 +4,7 @@ from bot.service import (
 )
 from telegram import Update
 from telegram.ext import ContextTypes
-from settings.config import CHAT_ID, SUPPORT, ADMIN, USER_1, USER_2, PERIOD
+from settings.config import CHAT_ID, SUPPORT, ADMIN, USER_1, USER_2, USER_3, PERIOD
 import telegram
 from typing import List
 
@@ -12,7 +12,7 @@ from typing import List
 GRUPO_COORDENADAS_ID = int(CHAT_ID)
 
 # Lista de usuarios permitidos para activar los comandos
-USUARIOS_PERMITIDOS = [int(SUPPORT), int(ADMIN), int(USER_1), int(USER_2)]
+USUARIOS_PERMITIDOS = [int(SUPPORT), int(ADMIN), int(USER_1), int(USER_2), int(USER_3)]
 
 PERIOD = int(PERIOD)
 

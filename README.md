@@ -20,10 +20,14 @@ To run this project, you'll need to add the following environment variables to y
 
 `PERIOD`
 
+`USER_1`
+
+`USER_2`
+
 Clone the project
 
 ```bash
-$ git clone https://github.com/Geffrerson7/pokemon-coordinates-telegram-bot.git
+$ git clone https://github.com/Geffrerson7/pvp-telegram-bot.git
 ```
 
 Navigate to the project directory
@@ -61,12 +65,21 @@ Once all of that is done, proceed to start the app
 
 ## Telegram bot's menu
 
-Start sending PVP coordinates:
+Start sending Great League PVP coordinates:
 
 ```bash
-  /pvp1500
+/pvp1500
 ```
 
+Start sending Ultra League PVP coordinates:
+```bash
+/pvp2500
+```
+
+Start sending Master League PVP coordinates:
+```bash
+/pvp_master
+```
 Stop sending coordinates:
 ```bash
   /stop
