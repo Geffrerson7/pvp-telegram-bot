@@ -8343,6 +8343,30 @@ pokedex = [
         "baseHealth": 121,
         "family": "smoliv",
     },
+    {
+        "number": "929",
+        "name": "Dolliv",
+        "baseAttack": 137,
+        "baseDefense": 131,
+        "baseHealth": 141,
+        "family": "smoliv",
+    },
+    {
+        "number": "930",
+        "name": "Arboliva",
+        "baseAttack": 219,
+        "baseDefense": 189,
+        "baseHealth": 186,
+        "family": "smoliv",
+    },
+    {
+        "number": "996",
+        "name": "Frigibax",
+        "baseAttack": 134,
+        "baseDefense": 86,
+        "baseHealth": 163,
+        "family": "frigibax",
+    },
 ]
 
 null_rank = {

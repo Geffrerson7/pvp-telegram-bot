@@ -1,9 +1,8 @@
-import requests, logging, re, time, json, datetime
+import requests, logging, re, time, json, datetime, traceback
 from typing import Dict, List, Union
 from math import floor
 from bot.constants import (
     level_constants,
-    pokedex,
     null_rank,
     CUMULATIVE_STARDUST,
     CUMULATIVE_CANDY,
@@ -258,7 +257,9 @@ def pokemon_is_galarian(pokemon_name: str, pokemon_move_1: str) -> bool:
     ):
         return True
     if pokemon_name == "Slowking" and (
-        pokemon_move_1 == "Ácido" or pokemon_move_1 == "Confusión" or pokemon_move_1 == "Infortunio"
+        pokemon_move_1 == "Ácido"
+        or pokemon_move_1 == "Confusión"
+        or pokemon_move_1 == "Infortunio"
     ):
         return True
     if pokemon_name == "Zigzagoon" and (
@@ -297,31 +298,41 @@ def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
     ):
         return True
     if pokemon_name == "Raichu" and (
-        pokemon_move_1 == "Impactrueno" or pokemon_move_1 == "Chispa" or pokemon_move_1 == "Voltiocambio"
+        pokemon_move_1 == "Impactrueno"
+        or pokemon_move_1 == "Chispa"
+        or pokemon_move_1 == "Voltiocambio"
     ):
         return True
     if pokemon_name == "Sandshrew" and (
-        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Nieve Polvo" 
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Nieve Polvo"
     ):
         return True
     if pokemon_name == "Sandslash" and (
-        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Nieve Polvo" or pokemon_move_1 == "Garra Umbría"
+        pokemon_move_1 == "Garra Metal"
+        or pokemon_move_1 == "Nieve Polvo"
+        or pokemon_move_1 == "Garra Umbría"
     ):
         return True
     if pokemon_name == "Vulpix" and (
-        pokemon_move_1 == "Cabezazo Zen" or pokemon_move_1 == "Nieve Polvo" 
+        pokemon_move_1 == "Cabezazo Zen" or pokemon_move_1 == "Nieve Polvo"
     ):
         return True
     if pokemon_name == "Ninetales" and (
-        pokemon_move_1 == "Finta" or pokemon_move_1 == "Nieve Polvo" or pokemon_move_1 == "Encanto"
+        pokemon_move_1 == "Finta"
+        or pokemon_move_1 == "Nieve Polvo"
+        or pokemon_move_1 == "Encanto"
     ):
         return True
     if pokemon_name == "Diglett" and (
-        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Bofetón Lodo" or pokemon_move_1 == "Ataque Arena"
+        pokemon_move_1 == "Garra Metal"
+        or pokemon_move_1 == "Bofetón Lodo"
+        or pokemon_move_1 == "Ataque Arena"
     ):
         return True
     if pokemon_name == "Dugtrio" and (
-        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Bofetón Lodo" or pokemon_move_1 == "Ataque Arena"
+        pokemon_move_1 == "Garra Metal"
+        or pokemon_move_1 == "Bofetón Lodo"
+        or pokemon_move_1 == "Ataque Arena"
     ):
         return True
     if pokemon_name == "Meowth" and (
@@ -337,27 +348,35 @@ def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
     ):
         return True
     if pokemon_name == "Graveler" and (
-        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Lanzarrocas" or pokemon_move_1 == "Bofetón Lodo"
+        pokemon_move_1 == "Disparo Lodo"
+        or pokemon_move_1 == "Lanzarrocas"
+        or pokemon_move_1 == "Bofetón Lodo"
     ):
         return True
     if pokemon_name == "Golem" and (
-        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Lanzarrocas" or pokemon_move_1 == "Bofetón Lodo"
+        pokemon_move_1 == "Disparo Lodo"
+        or pokemon_move_1 == "Lanzarrocas"
+        or pokemon_move_1 == "Bofetón Lodo"
     ):
         return True
     if pokemon_name == "Grimer" and (
-        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Puya Nociva" 
+        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Puya Nociva"
     ):
         return True
     if pokemon_name == "Muk" and (
-        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Puya Nociva" or pokemon_move_1 == "Alarido"
+        pokemon_move_1 == "Mordisco"
+        or pokemon_move_1 == "Puya Nociva"
+        or pokemon_move_1 == "Alarido"
     ):
         return True
     if pokemon_name == "Exeggutor" and (
-        pokemon_move_1 == "Cola Dragón" or pokemon_move_1 == "Semilladora" 
+        pokemon_move_1 == "Cola Dragón" or pokemon_move_1 == "Semilladora"
     ):
         return True
     if pokemon_name == "Marowak" and (
-        pokemon_move_1 == "Golpe Roca" or pokemon_move_1 == "Infortunio" or pokemon_move_1 == "Giro Fuego"
+        pokemon_move_1 == "Golpe Roca"
+        or pokemon_move_1 == "Infortunio"
+        or pokemon_move_1 == "Giro Fuego"
     ):
         return True
     return False
@@ -377,11 +396,11 @@ def calculate_cost(start_lvl, end_lvl):
     return {"stardust": stardust, "candy": candy}
 
 
-def fetch_pvp_pokemon_data(max_cp:int):
+def fetch_pvp_pokemon_data(max_cp: int):
     """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
     pvp_pokemon_list = []
 
-    for iv in range(100, 80, -10):
+    for iv in range(100, 70, -10):
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
@@ -391,11 +410,12 @@ def fetch_pvp_pokemon_data(max_cp:int):
 
             if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
                 pokemon_name += " Galar"
-                
+
             with open(f"./data/dict_ranking_{max_cp}.json", "r") as file:
                 rankings_data = json.load(file)
             first_rank = rankings_data.get(pokemon_name)
-
+            if not first_rank:
+                first_rank = null_rank
             if (
                 pokemon["attack"] == first_rank["attackStat"]
                 and pokemon["defence"] == first_rank["defenseStat"]
@@ -411,16 +431,16 @@ def fetch_pvp_pokemon_data(max_cp:int):
     return pvp_pokemon_list
 
 
-def league_signature(max_cp:int):
+def league_signature(max_cp: int):
     if max_cp == 1500:
         return "🅶🅻"
     elif max_cp == 2500:
         return "🆄🅻"
     else:
         return "🅼🅻"
-    
 
-def generate_pvp_pokemon_messages(max_cp:int):
+
+def generate_pvp_pokemon_messages(max_cp: int):
     """Retrieves Pokemon data, formats it into messages, and returns a list of formatted messages ready to be sent."""
     try:
         total_message = []
@@ -496,6 +516,7 @@ def generate_pvp_pokemon_messages(max_cp:int):
             logging.error("Pokemons not found")
     except Exception as e:
         logging.error(f"Error sending Pokemon data: {e}")
+        logging.error(traceback.format_exc())
         return None
     return total_message
 
