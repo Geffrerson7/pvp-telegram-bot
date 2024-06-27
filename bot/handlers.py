@@ -34,9 +34,11 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No tienes permiso para utilizar este comando.")
         return
 
-    job = context.chat_data.get("callback_coordinate_start_pvp_1500")
+    job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
+    job_start_pvp_2500 = context.chat_data.get("callback_coordinate_start_pvp_2500")
+    job_start_pvp_master_league = context.chat_data.get("callback_coordinate_start_pvp_master_league")
 
-    if job:
+    if job_start_pvp_1500 or job_start_pvp_2500 or job_start_pvp_master_league:
         await update.message.reply_text(
             "Lo siento, ya hay una instancia activa del bot. Por favor, espera a que se detenga antes de iniciar otra."
         )
