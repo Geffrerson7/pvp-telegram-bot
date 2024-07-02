@@ -657,3 +657,163 @@ def calculate_rank(
         # Handle other exceptions
         print(f"An error occurred while calculating rank: {e}")
         return {"rank": null_rank}
+
+
+def fetch_all_pvp_pokemon_data():
+    """Fetches PvP (Player versus Player) Pokemon data for the Great League."""
+    pvp_pokemon_list = []
+
+    for iv in range(100, 70, -10):
+        pokemons_list = fetch_pokemon_data_by_iv(iv)
+        for pokemon in pokemons_list:
+            pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
+            dict_pokemon_move = retrieve_pokemon_move(pokemon["move1"], pokemon_name)
+            if pokemon_is_alolan(pokemon_name, dict_pokemon_move["name"]):
+                pokemon_name += " Alola"
+
+            if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
+                pokemon_name += " Galar"
+
+            with open(f"./data/dict_ranking_1500.json", "r") as file:
+                rankings_1500_data = json.load(file)
+
+            with open(f"./data/dict_ranking_2500.json", "r") as file:
+                rankings_2500_data = json.load(file)
+
+            with open(f"./data/dict_ranking_9999.json", "r") as file:
+                rankings_master_data = json.load(file)
+
+            first_rank_1500 = rankings_1500_data.get(pokemon_name)
+            first_rank_2500 = rankings_2500_data.get(pokemon_name)
+            first_rank_master = rankings_master_data.get(pokemon_name)
+
+            if not first_rank_1500:
+                first_rank_1500 = null_rank
+
+            if not first_rank_2500:
+                first_rank_2500 = null_rank
+
+            if not first_rank_master:
+                first_rank_master = null_rank
+
+            if (
+                pokemon["attack"] == first_rank_1500["attackStat"]
+                and pokemon["defence"] == first_rank_1500["defenseStat"]
+                and pokemon["stamina"] == first_rank_1500["healthStat"]
+            ):
+                pokemon_dict_1500 = {
+                    "pokemon": pokemon,
+                    "ranking": first_rank_1500,
+                    "iv": iv,
+                    "max_cp": 1500,
+                }
+                pvp_pokemon_list.append(pokemon_dict_1500)
+
+            if (
+                pokemon["attack"] == first_rank_2500["attackStat"]
+                and pokemon["defence"] == first_rank_2500["defenseStat"]
+                and pokemon["stamina"] == first_rank_2500["healthStat"]
+            ):
+                pokemon_dict_2500 = {
+                    "pokemon": pokemon,
+                    "ranking": first_rank_2500,
+                    "iv": iv,
+                    "max_cp": 2500,
+                }
+                pvp_pokemon_list.append(pokemon_dict_2500)
+
+            if (
+                pokemon["attack"] == first_rank_master["attackStat"]
+                and pokemon["defence"] == first_rank_master["defenseStat"]
+                and pokemon["stamina"] == first_rank_master["healthStat"]
+            ):
+                pokemon_dict_master = {
+                    "pokemon": pokemon,
+                    "ranking": first_rank_master,
+                    "iv": iv,
+                    "max_cp": 9999,
+                }
+                pvp_pokemon_list.append(pokemon_dict_master)
+
+    return pvp_pokemon_list
+
+
+def generate_all_pvp_pokemon_messages():
+    """Retrieves Pokemon data, formats it into messages, and returns a list of formatted messages ready to be sent."""
+    try:
+        total_message = []
+        total_data = fetch_all_pvp_pokemon_data()
+        if total_data != []:
+            message_delay = 3 if len(total_data) > 18 else 2
+            for data in total_data:
+                delay = (
+                    1
+                    + coordinates_waiting_time(len(total_data))
+                    + message_delay * total_data.index(data)
+                )
+                dsp = calculate_remaining_time(data["pokemon"]["despawn"], delay)
+                if dsp:
+                    pokemon_name = escape_string(
+                        retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
+                    )
+                    iv_number = data["iv"]
+                    cp = data["pokemon"]["cp"]
+                    level = data["pokemon"]["level"]
+                    shiny_icon = "✨" if data["pokemon"]["shiny"] == 0 else ""
+                    latitude = data["pokemon"]["lat"]
+                    longitude = data["pokemon"]["lng"]
+                    flag = data["pokemon"]["flag"]
+                    move1 = escape_string(
+                        retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)[
+                            "name"
+                        ]
+                    )
+                    move2 = escape_string(
+                        retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)[
+                            "name"
+                        ]
+                    )
+                    move1_icon = retrieve_pokemon_move(
+                        data["pokemon"]["move1"], pokemon_name
+                    )["icon"]
+                    move2_icon = retrieve_pokemon_move(
+                        data["pokemon"]["move2"], pokemon_name
+                    )["icon"]
+                    height = escape_string(
+                        retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
+                    )
+                    weight = escape_string(
+                        retrieve_pokemon_weight(data["pokemon"]["pokemon_id"])
+                    )
+                    pokemon_id = data["pokemon"]["pokemon_id"]
+                    cp_pvp_pokemon = data["ranking"]["cp"]
+                    level_pvp_pokemon = escape_string(str(data["ranking"]["level"]))
+                    gender_icon = "♂️" if data["pokemon"]["gender"] == 1 else "♀️"
+                    candy = calculate_cost(
+                        data["pokemon"]["level"], data["ranking"]["level"]
+                    )["candy"]
+                    stardust = calculate_cost(
+                        data["pokemon"]["level"], data["ranking"]["level"]
+                    )["stardust"]
+                    league = league_signature(data["max_cp"])
+                    formatted_message = (
+                        f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
+                        f"IV:{iv_number} CP:{cp} LV:{level}\n"
+                        f"⚖️{weight}kg 📏{height}m\n"
+                        f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
+                        f"                     ▼\n"
+                        f"\#0{pokemon_id} \- *{pokemon_name}* {league}\n"
+                        f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
+                        f"⚗️{stardust} 🍬{candy}\n"
+                        f"☄️🥊🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
+                        f"{flag}\n"
+                        f"`{latitude},{longitude}`"
+                    )
+                    total_message.append(formatted_message)
+        else:
+            logging.error("Pokemons not found")
+    except Exception as e:
+        logging.error(f"Error sending Pokemon data: {e}")
+        logging.error(traceback.format_exc())
+        return None
+    return total_message
