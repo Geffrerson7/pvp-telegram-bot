@@ -2,7 +2,16 @@ from telegram import Update
 from telegram.ext import (
     ContextTypes,
 )
-from settings.config import CHAT_ID, SUPPORT, ADMIN, USER_1, USER_2, USER_3, DEVELOPER_CHAT_ID
+from settings.config import (
+    CHAT_ID,
+    SUPPORT,
+    ADMIN,
+    USER_1,
+    USER_2,
+    USER_3,
+    DEVELOPER_CHAT_ID,
+    MESSAGE_THREAD_ID,
+)
 import traceback
 import html
 import json
@@ -13,7 +22,7 @@ from common.log import logger
 DEVELOPER_CHAT_ID = int(DEVELOPER_CHAT_ID)
 # ID del grupo al que se enviarán las coordenadas
 GRUPO_COORDENADAS_ID = int(CHAT_ID)
-
+TEMA_ID = int(MESSAGE_THREAD_ID)
 # Lista de usuarios permitidos para activar los comandos
 USUARIOS_PERMITIDOS = [int(SUPPORT), int(ADMIN), int(USER_1), int(USER_2), int(USER_3)]
 
@@ -24,23 +33,33 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     # Verificar si el mensaje proviene del grupo permitido
     if update.effective_chat.id != GRUPO_COORDENADAS_ID:
-        await update.message.reply_text(
-            "Los comandos solo pueden ser activados en el grupo de @aepvptopgalaxy"
+        await context.bot.send_message(
+            chat_id=GRUPO_COORDENADAS_ID,
+            message_thread_id=TEMA_ID,
+            text="Los comandos solo pueden ser activados en el grupo de @top100galaxy1",
         )
         return
 
     # Verificar si el usuario está permitido para usar el comando
     if update.effective_user.id not in USUARIOS_PERMITIDOS:
-        await update.message.reply_text("No tienes permiso para utilizar este comando.")
+        await context.bot.send_message(
+            chat_id=GRUPO_COORDENADAS_ID,
+            message_thread_id=TEMA_ID,
+            text="No tienes permiso para utilizar este comando.",
+        )
         return
 
     job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
     job_start_pvp_2500 = context.chat_data.get("callback_coordinate_start_pvp_2500")
-    job_start_pvp_master_league = context.chat_data.get("callback_coordinate_start_pvp_master_league")
+    job_start_pvp_master_league = context.chat_data.get(
+        "callback_coordinate_start_pvp_master_league"
+    )
 
     if job_start_pvp_1500 or job_start_pvp_2500 or job_start_pvp_master_league:
-        await update.message.reply_text(
-            "Lo siento, ya hay una instancia activa del bot. Por favor, espera a que se detenga antes de iniciar otra."
+        await context.bot.send_message(
+            chat_id=GRUPO_COORDENADAS_ID,
+            message_thread_id=TEMA_ID,
+            text="Lo siento, ya hay una instancia activa del bot. Por favor, espera a que se detenga antes de iniciar otra.",
         )
         return
     # Si no hay instancia activa, proceder con el manejo del mensaje
@@ -53,7 +72,11 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text += "/pvp - Inicia el envío de todas las coordenadas PVP.\n"
     message_text += "/stop - Detiene el envío de coordenadas PVP.\n"
 
-    await update.message.reply_text(message_text)
+    await context.bot.send_message(
+        chat_id=GRUPO_COORDENADAS_ID,
+        message_thread_id=TEMA_ID,
+        text=message_text,
+    )
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -100,4 +123,8 @@ async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text += "/pvp_master - Inicia el envío de coordenadas PVP Master League.\n"
     message_text += "/pvp - Inicia el envío de todas las coordenadas PVP.\n"
     message_text += "/stop - Detiene el envío de coordenadas PVP.\n"
-    await update.message.reply_text(message_text)
+    await context.bot.send_message(
+        chat_id=GRUPO_COORDENADAS_ID,
+        message_thread_id=TEMA_ID,
+        text=message_text,
+    )
