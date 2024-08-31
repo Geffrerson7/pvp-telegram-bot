@@ -8600,6 +8600,22 @@ pokedex = [
         "family": "wiglett",
     },
     {
+        "number": "961",
+        "name": "Wugtrio",
+        "baseAttack": 205,
+        "baseDefense": 136,
+        "baseHealth": 111,
+        "family": "wiglett",
+    },
+    {
+        "number": "962",
+        "name": "Wugtrio",
+        "baseAttack": 205,
+        "baseDefense": 136,
+        "baseHealth": 111,
+        "family": "wiglett",
+    },
+    {
         "number": "996",
         "name": "Frigibax",
         "baseAttack": 134,

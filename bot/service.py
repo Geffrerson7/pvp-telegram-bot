@@ -55,6 +55,7 @@ def fetch_pokemon_data_by_iv(iv):
     for url in urls:
         headers_for_url = headers.get(url, {})
         try:
+            logging.debug(f"Fetching data from URL: {url} with params: {params}")
             response = requests.get(url, params=params, headers=headers_for_url)
             response.raise_for_status()  # Si ocurre un error, lanzará una excepción
             data = response.json()
