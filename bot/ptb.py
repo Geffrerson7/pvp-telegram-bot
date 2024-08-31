@@ -4,24 +4,18 @@ from settings import config
 from telegram.ext import Application
 import traceback
 
-
 ptb = (
     Application.builder()
     .token(config.TOKEN)
     .read_timeout(7)
     .get_updates_read_timeout(42)
+    .build()  
 )
-if config.DEBUG == "True":
-    ptb = ptb.build()
-else:
-    ptb = ptb.updater(None).build()
-
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     try:
         if config.BOTHOST:
-            print(f"DEBUG:{config.DEBUG}")
             print(f"Attempting to configure webhook with URL: {config.BOTHOST}")
             webhook_info = await ptb.bot.get_webhook_info()
             if webhook_info.url != config.BOTHOST:
