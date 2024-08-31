@@ -23,6 +23,7 @@ async def lifespan(_: FastAPI):
         if config.BOTHOST:
             print(f"Attempting to configure webhook with URL: {config.BOTHOST}")
             webhook_info = await ptb.bot.get_webhook_info()
+            print(f"webhook_url:{webhook_info.url}")
             if webhook_info.url != config.BOTHOST:
                 await ptb.bot.setWebhook(config.BOTHOST.strip())
                 print(f"Webhook configured at {config.BOTHOST}")
