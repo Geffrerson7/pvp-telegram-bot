@@ -230,14 +230,43 @@ async def start_pvp_1500(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
 
         job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
+        job_start_pvp_2500 = context.chat_data.get("callback_coordinate_start_pvp_2500")
+        job_start_pvp_master_league = context.chat_data.get(
+            "callback_coordinate_start_pvp_master_league"
+        )
+        job_start_pvp = context.chat_data.get("callback_coordinate_start_pvp")
 
-        if job_start_pvp_1500:
+        if job_start_pvp_2500:
+            job_start_pvp_2500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_2500"]
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
                 message_thread_id=TEMA_ID,
-                text="Las coordenadas de PVP 1500 se están enviando. Si desea detener el envío digite /stop",
+                text="Las coordenadas PVP 1500 se están enviando. Si desea enviar PVP 2500, digite /stoppvp y luego /pvp2500.",
             )
             return
+        elif job_start_pvp_master_league:
+            job_start_pvp_master_league.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_master_league"]
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas PVP 1500 se están enviando. Si desea enviar PVP Master Ball League, digite /stoppvp y luego /pvpmaster.",
+            )
+            return
+        elif job_start_pvp:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de PVP 1500 se están enviando. Si desea enviar PVP, digite /stoppvp y luego /pvp.",
+            )
+            return
+        elif job_start_pvp_1500:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de ya PVP 1500 se están enviando. Si desea detener el envío digite /stoppvp",
+            )
         else:
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
@@ -285,15 +314,44 @@ async def start_pvp_2500(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             )
             return
 
+        job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
         job_start_pvp_2500 = context.chat_data.get("callback_coordinate_start_pvp_2500")
+        job_start_pvp_master_league = context.chat_data.get(
+            "callback_coordinate_start_pvp_master_league"
+        )
+        job_start_pvp = context.chat_data.get("callback_coordinate_start_pvp")
 
-        if job_start_pvp_2500:
+        if job_start_pvp_1500:
+            job_start_pvp_1500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_1500"]
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
                 message_thread_id=TEMA_ID,
-                text="Las coordenadas de PVP 2500 se están enviando. Si desea detener el envío digite /stop",
+                text="Las coordenadas PVP 2500 se están enviando. Si desea enviar PVP 1500, digite /stoppvp y luego /pvp1500.",
             )
             return
+        elif job_start_pvp_master_league:
+            job_start_pvp_master_league.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_master_league"]
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas PVP 2500 se están enviando. Si desea enviar PVP Master Ball League, digite /stoppvp y luego /pvpmaster.",
+            )
+            return
+        elif job_start_pvp:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de PVP 2500 se están enviando. Si desea enviar PVP, digite /stoppvp y luego /pvp.",
+            )
+            return
+        elif job_start_pvp_2500:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de PVP 2500 ya se están enviando. Si desea detener el envío digite /stoppvp",
+            )
         else:
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
@@ -343,17 +401,44 @@ async def start_pvp_master_league(
             )
             return
 
+        job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
+        job_start_pvp_2500 = context.chat_data.get("callback_coordinate_start_pvp_2500")
         job_start_pvp_master_league = context.chat_data.get(
             "callback_coordinate_start_pvp_master_league"
         )
+        job_start_pvp = context.chat_data.get("callback_coordinate_start_pvp")
 
-        if job_start_pvp_master_league:
+        if job_start_pvp_1500:
+            job_start_pvp_1500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_1500"]
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
                 message_thread_id=TEMA_ID,
-                text="Las coordenadas de PVP Master Ball League se están enviando. Si desea detener el envío digite /stop",
+                text="Las coordenadas PVP Master Ball League se están enviando. Si desea enviar PVP 1500, digite /stoppvp y luego /pvp1500.",
             )
             return
+        elif job_start_pvp_2500:
+            job_start_pvp_2500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_2500"]
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas PVP Master Ball League se están enviando. Si desea enviar PVP 2500, digite /stoppvp y luego /pvp2500.",
+            )
+            return
+        elif job_start_pvp:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de PVP Master Ball League se están enviando. Si desea enviar PVP, digite /stoppvp y luego /pvp.",
+            )
+            return
+        elif job_start_pvp_master_league:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de PVP Master Ball League se están enviando. Si desea detener el envío digite /stoppvp",
+            )
         else:
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
@@ -374,7 +459,7 @@ async def start_pvp_master_league(
         await context.bot.send_message(
             chat_id=GRUPO_COORDENADAS_ID,
             message_thread_id=TEMA_ID,
-            text="Se ha producido un error al ejecutar el comando /pvp_master. Por favor, comunica este error al administrador del bot para que pueda solucionarlo lo antes posible.",
+            text="Se ha producido un error al ejecutar el comando /pvpmaster. Por favor, comunica este error al administrador del bot para que pueda solucionarlo lo antes posible.",
         )
 
     except Exception as e:
@@ -405,15 +490,46 @@ async def start_pvp(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             )
             return
 
+        job_start_pvp_1500 = context.chat_data.get("callback_coordinate_start_pvp_1500")
+        job_start_pvp_2500 = context.chat_data.get("callback_coordinate_start_pvp_2500")
+        job_start_pvp_master_league = context.chat_data.get(
+            "callback_coordinate_start_pvp_master_league"
+        )
         job_start_pvp = context.chat_data.get("callback_coordinate_start_pvp")
 
-        if job_start_pvp:
+        if job_start_pvp_1500:
+            job_start_pvp_1500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_1500"]
             await context.bot.send_message(
                 chat_id=GRUPO_COORDENADAS_ID,
                 message_thread_id=TEMA_ID,
-                text="Las coordenadas de PVP se están enviando. Si desea detener el envío digite /stop",
+                text="Las coordenadas PVP se están enviando. Si desea enviar PVP 1500, digite /stoppvp y luego /pvp1500.",
             )
             return
+        elif job_start_pvp_2500:
+            job_start_pvp_2500.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_2500"]
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas PVP se están enviando. Si desea enviar PVP 2500, digite /stoppvp y luego /pvp2500.",
+            )
+            return
+        elif job_start_pvp_master_league:
+            job_start_pvp_master_league.schedule_removal()
+            del context.chat_data["callback_coordinate_start_pvp_master_league"]
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas PVP se están enviando. Si desea enviar PVP Master Ball League, digite /stoppvp y luego /pvpmaster.",
+            )
+            return
+        elif job_start_pvp:
+            await context.bot.send_message(
+                chat_id=GRUPO_COORDENADAS_ID,
+                message_thread_id=TEMA_ID,
+                text="Las coordenadas de PVP ya se están enviando.",
+            )
         else:
             await update.message.reply_text("Buscando coordenadas...")
             job_start_pvp = context.job_queue.run_repeating(
