@@ -24,6 +24,10 @@ To run this project, you'll need to add the following environment variables to y
 
 `USER_2`
 
+`USER_3`
+
+`MESSAGE_THREAD_ID`
+
 Clone the project
 
 ```bash
@@ -64,6 +68,12 @@ Once all of that is done, proceed to start the app
 ```
 
 ## Telegram bot's menu
+
+Start sending Great League PVP coordinates:
+
+```bash
+/pvp
+```
 
 Start sending Great League PVP coordinates:
 
