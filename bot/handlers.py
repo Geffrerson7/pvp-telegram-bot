@@ -68,9 +68,9 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text += "Este es un menú explicativo:\n\n"
     message_text += "/pvp1500 - Inicia el envío de coordenadas PVP 1500.\n"
     message_text += "/pvp2500 - Inicia el envío de coordenadas PVP 2500.\n"
-    message_text += "/pvp_master - Inicia el envío de coordenadas PVP Master League.\n"
+    message_text += "/pvpmaster - Inicia el envío de coordenadas PVP Master League.\n"
     message_text += "/pvp - Inicia el envío de todas las coordenadas PVP.\n"
-    message_text += "/stop - Detiene el envío de coordenadas PVP.\n"
+    message_text += "/stoppvp - Detiene el envío de coordenadas PVP.\n"
 
     await context.bot.send_message(
         chat_id=GRUPO_COORDENADAS_ID,
@@ -120,9 +120,9 @@ async def unknown_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text += "Esta es la lista de comandos válidos:\n\n"
     message_text += "/pvp1500 - Inicia el envío de coordenadas PVP 1500.\n"
     message_text += "/pvp2500 - Inicia el envío de coordenadas PVP 2500.\n"
-    message_text += "/pvp_master - Inicia el envío de coordenadas PVP Master League.\n"
+    message_text += "/pvpmaster - Inicia el envío de coordenadas PVP Master League.\n"
     message_text += "/pvp - Inicia el envío de todas las coordenadas PVP.\n"
-    message_text += "/stop - Detiene el envío de coordenadas PVP.\n"
+    message_text += "/stoppvp - Detiene el envío de coordenadas PVP.\n"
     await context.bot.send_message(
         chat_id=GRUPO_COORDENADAS_ID,
         message_thread_id=TEMA_ID,
