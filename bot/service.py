@@ -398,7 +398,7 @@ def calculate_cost(start_lvl, end_lvl):
 
 
 def fetch_pvp_pokemon_data(max_cp: int):
-    """Fetches PvP (Player versus Player) Pokemon data for the Great League (1500 CP cap)."""
+    """Fetches PvP (Player versus Player) Pokemon data"""
     pvp_pokemon_list = []
 
     for iv in range(100, 70, -10):
@@ -414,6 +414,7 @@ def fetch_pvp_pokemon_data(max_cp: int):
 
             with open(f"./data/dict_ranking_{max_cp}.json", "r") as file:
                 rankings_data = json.load(file)
+
             first_rank = rankings_data.get(pokemon_name)
             if not first_rank:
                 first_rank = null_rank
@@ -425,6 +426,7 @@ def fetch_pvp_pokemon_data(max_cp: int):
                 pokemon_dict = {
                     "pokemon": pokemon,
                     "ranking": first_rank,
+                    "name": pokemon_name,
                     "iv": iv,
                 }
                 pvp_pokemon_list.append(pokemon_dict)
@@ -457,7 +459,10 @@ def generate_pvp_pokemon_messages(max_cp: int):
                 dsp = calculate_remaining_time(data["pokemon"]["despawn"], delay)
                 if dsp:
                     pokemon_name = escape_string(
-                        retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
+                        data["name"]
+                        .title()
+                        .replace("Galar", "de Galar")
+                        .replace("Alola", "de Alola")
                     )
                     iv_number = data["iv"]
                     cp = data["pokemon"]["cp"]
@@ -705,6 +710,7 @@ def fetch_all_pvp_pokemon_data():
                 pokemon_dict_1500 = {
                     "pokemon": pokemon,
                     "ranking": first_rank_1500,
+                    "name": pokemon_name,
                     "iv": iv,
                     "max_cp": 1500,
                 }
@@ -718,6 +724,7 @@ def fetch_all_pvp_pokemon_data():
                 pokemon_dict_2500 = {
                     "pokemon": pokemon,
                     "ranking": first_rank_2500,
+                    "name": pokemon_name,
                     "iv": iv,
                     "max_cp": 2500,
                 }
@@ -731,6 +738,7 @@ def fetch_all_pvp_pokemon_data():
                 pokemon_dict_master = {
                     "pokemon": pokemon,
                     "ranking": first_rank_master,
+                    "name": pokemon_name,
                     "iv": iv,
                     "max_cp": 9999,
                 }
@@ -755,7 +763,10 @@ def generate_all_pvp_pokemon_messages():
                 dsp = calculate_remaining_time(data["pokemon"]["despawn"], delay)
                 if dsp:
                     pokemon_name = escape_string(
-                        retrieve_pokemon_name(data["pokemon"]["pokemon_id"]).title()
+                        data["name"]
+                        .title()
+                        .replace("Galar", "de Galar")
+                        .replace("Alola", "de Alola")
                     )
                     iv_number = data["iv"]
                     cp = data["pokemon"]["cp"]
