@@ -71,61 +71,67 @@ def fetch_pokemon_data_by_iv(iv):
     return total_data
 
 
-def retrieve_pokemon_name(pokemon_id):
-    """Gets the name of a Pokémon based on its ID using the PokeAPI."""
+def retrieve_pokemon_name(pokemon_id, filename="./data/pokemon_data.json"):
+    """Returns the name of the Pokémon by its ID from a JSON file."""
     try:
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}"
-        response = requests.get(pokeapi_url)
-        response.raise_for_status()
+        # Cargar el archivo JSON con los datos de los Pokémon
+        with open(filename, "r") as json_file:
+            pokemon_list = json.load(json_file)
 
-        data = response.json()
-        name = data.get("name").title()
+        # Buscar el Pokémon por su ID
+        for pokemon in pokemon_list:
+            if pokemon.get("id") == pokemon_id:
+                return pokemon.get("name")
 
-        return name
-    except requests.exceptions.RequestException as e:
-        logging.warning(f"Error fetching Pokémon name for ID {pokemon_id}: {e}")
-    except ValueError as e:
-        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
+        # Si no se encuentra el Pokémon
+        return f"No Pokemon found with ID {pokemon_id}"
 
-    return None
+    except FileNotFoundError:
+        return f"File '{filename}' not found."
+    except json.JSONDecodeError:
+        return "Error decoding the JSON file."
 
 
-def retrieve_pokemon_height(pokemon_id):
-    """Gets the height of a Pokémon based on its ID using the PokeAPI."""
+def retrieve_pokemon_height(pokemon_id, filename="./data/pokemon_data.json"):
+    """Returns the height of the Pokémon by its ID from a JSON file."""
     try:
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}"
-        response = requests.get(pokeapi_url)
-        response.raise_for_status()
+        # Cargar el archivo JSON con los datos de los Pokémon
+        with open(filename, "r") as json_file:
+            pokemon_list = json.load(json_file)
 
-        data = response.json()
-        height = data.get("height") / 10
+        # Buscar el Pokémon por su ID
+        for pokemon in pokemon_list:
+            if pokemon.get("id") == pokemon_id:
+                return str(pokemon.get("height"))
 
-        return str(height)
-    except requests.exceptions.RequestException as e:
-        logging.warning(f"Error fetching Pokemon height for ID {pokemon_id}: {e}")
-    except ValueError as e:
-        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
+        # Si no se encuentra el Pokémon
+        return f"No Pokemon found with ID {pokemon_id}"
 
-    return None
+    except FileNotFoundError:
+        return f"File '{filename}' not found."
+    except json.JSONDecodeError:
+        return "Error decoding the JSON file."
 
 
-def retrieve_pokemon_weight(pokemon_id):
-    """Gets the weight of a Pokémon based on its ID using the PokeAPI."""
+def retrieve_pokemon_weight(pokemon_id, filename="./data/pokemon_data.json"):
+    """Returns the weight of the Pokémon by its ID from a JSON file."""
     try:
-        pokeapi_url = f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}"
-        response = requests.get(pokeapi_url)
-        response.raise_for_status()
+        # Cargar el archivo JSON con los datos de los Pokémon
+        with open(filename, "r") as json_file:
+            pokemon_list = json.load(json_file)
 
-        data = response.json()
-        weight = data.get("weight") / 10
+        # Buscar el Pokémon por su ID
+        for pokemon in pokemon_list:
+            if pokemon.get("id") == pokemon_id:
+                return str(pokemon.get("weight"))
 
-        return str(weight)
-    except requests.exceptions.RequestException as e:
-        logging.warning(f"Error fetching Pokemon weight for ID {pokemon_id}: {e}")
-    except ValueError as e:
-        logging.error(f"Error decoding JSON response from PokeAPI: {e}")
+        # Si no se encuentra el Pokémon
+        return f"No Pokemon found with ID {pokemon_id}"
 
-    return None
+    except FileNotFoundError:
+        return f"File '{filename}' not found."
+    except json.JSONDecodeError:
+        return "Error decoding the JSON file."
 
 
 def calculate_remaining_time(despawn, delay):
@@ -217,91 +223,68 @@ def escape_string(input_string):
     return re.sub(r"[-.]", lambda x: "\\" + x.group(), input_string)
 
 
-def pokemon_is_galarian(pokemon_name: str, pokemon_move_1: str) -> bool:
+def pokemon_is_galarian(
+    pokemon_name: str, pokemon_move_1: str, pokemon_move_2: str
+) -> bool:
 
-    if pokemon_name == "Stunfisk" and (
-        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"
-    ):
+    if pokemon_name == "Stunfisk" and pokemon_move_1 == "Garra Metal":
         return True
-    if pokemon_name == "Meowth" and (
-        pokemon_move_1 == "Arañazo" or pokemon_move_1 == "Garra Metal"
-    ):
+    if pokemon_name == "Meowth" and pokemon_move_1 == "Garra Metal":
         return True
     if pokemon_name == "Ponyta" and (
         pokemon_move_1 == "Patada Baja" or pokemon_move_1 == "Psicocorte"
     ):
         return True
     if pokemon_name == "Rapidash" and (
-        pokemon_move_1 == "Patada Baja"
-        or pokemon_move_1 == "Psicocorte"
-        or pokemon_move_1 == "Viento Feérico"
+        pokemon_move_1 == "Psicocorte" or pokemon_move_1 == "Viento Feérico"
     ):
         return True
-    if pokemon_name == "Slowpoke" and (
-        pokemon_move_1 == "Confusión" or pokemon_move_1 == "Cola Férrea"
-    ):
+    if pokemon_name == "Slowpoke" and pokemon_move_1 == "Cola Férrea":
         return True
-    if pokemon_name == "Slowbro" and (
-        pokemon_move_1 == "Pistola Agua" or pokemon_move_1 == "Confusión"
-    ):
+    if pokemon_name == "Slowbro" and pokemon_move_1 == "Puya Nociva":
         return True
-    if pokemon_name == "Farfetch'd" and (
-        pokemon_move_1 == "Corte Furia" or pokemon_move_1 == "Golpe Roca"
-    ):
+    if pokemon_name == "Farfetch'd" and pokemon_move_1 == "Golpe Roca":
         return True
-    if pokemon_name == "Weezing" and (
-        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Viento Feérico"
-    ):
+    if pokemon_name == "Weezing" and pokemon_move_1 == "Viento Feérico":
         return True
     if pokemon_name == "Mr-Mime" and (
-        pokemon_move_1 == "Cabezazo Zen" or pokemon_move_1 == "Confusión"
+        pokemon_move_2 == "Puño Hielo" or pokemon_move_2 == "Triple Axel"
     ):
         return True
     if pokemon_name == "Slowking" and (
-        pokemon_move_1 == "Ácido"
-        or pokemon_move_1 == "Confusión"
-        or pokemon_move_1 == "Infortunio"
+        pokemon_move_1 == "Ácido" or pokemon_move_1 == "Infortunio"
     ):
         return True
-    if pokemon_name == "Zigzagoon" and (
-        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Derribo"
-    ):
+    if pokemon_name == "Zigzagoon" and pokemon_move_1 == "Derribo":
         return True
     if pokemon_name == "Linoone" and (
         pokemon_move_1 == "Lengüetazo" or pokemon_move_1 == "Alarido"
     ):
         return True
-    if pokemon_name == "Darumaka" and (
-        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Colmillo Hielo"
+    if pokemon_name == "Darumaka" and pokemon_move_1 == "Colmillo Hielo":
+        return True
+    if pokemon_name == "Darmitan" and pokemon_move_1 == "Colmillo Hielo":
+        return True
+    if pokemon_name == "Yamask" and (
+        pokemon_move_2 == "Tumba Rocas" or pokemon_move_2 == "Tinieblas"
     ):
         return True
-    if pokemon_name == "Darmitan" and (
-        pokemon_move_1 == "Placaje" or pokemon_move_1 == "Colmillo Hielo"
-    ):
-        return True
-    if pokemon_name == "Yamask" and pokemon_move_1 == "Impresionar":
-        return True
-    if pokemon_name == "Stunfisk" and (
-        pokemon_move_1 == "Disparo Lodo" or pokemon_move_1 == "Garra Metal"
-    ):
-        return True
+
     return False
 
 
-def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
+def pokemon_is_alolan(
+    pokemon_name: str, pokemon_move_1: str, pokemon_move_2: str
+) -> bool:
 
     if pokemon_name == "Rattata" and (
-        pokemon_move_1 == "Ataque Rápido" or pokemon_move_1 == "Placaje"
+        pokemon_move_2 == "Bola Sombra" or pokemon_move_2 == "Triturar"
     ):
         return True
-    if pokemon_name == "Raticate" and (
-        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Ataque Rápido"
-    ):
+    if pokemon_name == "Raticate" and pokemon_move_2 == "Triturar":
         return True
     if pokemon_name == "Raichu" and (
-        pokemon_move_1 == "Impactrueno"
-        or pokemon_move_1 == "Chispa"
-        or pokemon_move_1 == "Voltiocambio"
+        pokemon_move_2 == "Psíquico" or pokemon_move_1 == "Hierba Lazo"
     ):
         return True
     if pokemon_name == "Sandshrew" and (
@@ -309,9 +292,7 @@ def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
     ):
         return True
     if pokemon_name == "Sandslash" and (
-        pokemon_move_1 == "Garra Metal"
-        or pokemon_move_1 == "Nieve Polvo"
-        or pokemon_move_1 == "Garra Umbría"
+        pokemon_move_1 == "Nieve Polvo" or pokemon_move_1 == "Garra Umbría"
     ):
         return True
     if pokemon_name == "Vulpix" and (
@@ -319,65 +300,41 @@ def pokemon_is_alolan(pokemon_name: str, pokemon_move_1: str) -> bool:
     ):
         return True
     if pokemon_name == "Ninetales" and (
-        pokemon_move_1 == "Finta"
-        or pokemon_move_1 == "Nieve Polvo"
-        or pokemon_move_1 == "Encanto"
+        pokemon_move_1 == "Nieve Polvo" or pokemon_move_1 == "Encanto"
     ):
         return True
     if pokemon_name == "Diglett" and (
-        pokemon_move_1 == "Garra Metal"
-        or pokemon_move_1 == "Bofetón Lodo"
-        or pokemon_move_1 == "Ataque Arena"
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Ataque Arena"
     ):
         return True
     if pokemon_name == "Dugtrio" and (
-        pokemon_move_1 == "Garra Metal"
-        or pokemon_move_1 == "Bofetón Lodo"
-        or pokemon_move_1 == "Ataque Arena"
+        pokemon_move_1 == "Garra Metal" or pokemon_move_1 == "Ataque Arena"
     ):
         return True
-    if pokemon_name == "Meowth" and (
-        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Arañazo"
-    ):
+    if pokemon_name == "Meowth" and pokemon_move_2 == "Abrecaminos":
         return True
     if pokemon_name == "Persian" and (
-        pokemon_move_1 == "Arañazo" or pokemon_move_1 == "Finta"
+        pokemon_move_2 == "Pulso Umbrío" or pokemon_move_2 == "Abrecaminos"
     ):
         return True
-    if pokemon_name == "Geodude" and (
-        pokemon_move_1 == "Lanzarrocas" or pokemon_move_1 == "Voltiocambio"
-    ):
+    if pokemon_name == "Geodude" and pokemon_move_1 == "Voltiocambio":
         return True
-    if pokemon_name == "Graveler" and (
-        pokemon_move_1 == "Disparo Lodo"
-        or pokemon_move_1 == "Lanzarrocas"
-        or pokemon_move_1 == "Bofetón Lodo"
-    ):
+    if pokemon_name == "Graveler" and pokemon_move_1 == "Voltiocambio":
         return True
     if pokemon_name == "Golem" and (
-        pokemon_move_1 == "Disparo Lodo"
-        or pokemon_move_1 == "Lanzarrocas"
-        or pokemon_move_1 == "Bofetón Lodo"
+        pokemon_move_1 == "Voltiocambio" or pokemon_move_1 == "Rodar"
     ):
         return True
-    if pokemon_name == "Grimer" and (
-        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Puya Nociva"
-    ):
+    if pokemon_name == "Grimer" and pokemon_move_1 == "Mordisco":
         return True
     if pokemon_name == "Muk" and (
-        pokemon_move_1 == "Mordisco"
-        or pokemon_move_1 == "Puya Nociva"
-        or pokemon_move_1 == "Alarido"
+        pokemon_move_1 == "Mordisco" or pokemon_move_1 == "Alarido"
     ):
         return True
-    if pokemon_name == "Exeggutor" and (
-        pokemon_move_1 == "Cola Dragón" or pokemon_move_1 == "Semilladora"
-    ):
+    if pokemon_name == "Exeggutor" and pokemon_move_1 == "Cola Dragón":
         return True
     if pokemon_name == "Marowak" and (
-        pokemon_move_1 == "Golpe Roca"
-        or pokemon_move_1 == "Infortunio"
-        or pokemon_move_1 == "Giro Fuego"
+        pokemon_move_1 == "Infortunio" or pokemon_move_1 == "Giro Fuego"
     ):
         return True
     return False
@@ -405,11 +362,17 @@ def fetch_pvp_pokemon_data(max_cp: int):
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
-            dict_pokemon_move = retrieve_pokemon_move(pokemon["move1"], pokemon_name)
-            if pokemon_is_alolan(pokemon_name, dict_pokemon_move["name"]):
+            move1 = escape_string(
+                retrieve_pokemon_move(pokemon["move1"], pokemon_name)["name"]
+            )
+
+            move2 = escape_string(
+                retrieve_pokemon_move(pokemon["move2"], pokemon_name)["name"]
+            )
+            if pokemon_is_alolan(pokemon_name, move1, move2):
                 pokemon_name += " Alola"
 
-            if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
+            if pokemon_is_galarian(pokemon_name, move1, move2):
                 pokemon_name += " Galar"
 
             with open(f"./data/dict_ranking_{max_cp}.json", "r") as file:
@@ -673,11 +636,16 @@ def fetch_all_pvp_pokemon_data():
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
-            dict_pokemon_move = retrieve_pokemon_move(pokemon["move1"], pokemon_name)
-            if pokemon_is_alolan(pokemon_name, dict_pokemon_move["name"]):
+            move1 = escape_string(
+                retrieve_pokemon_move(pokemon["move1"], pokemon_name)["name"]
+            )
+            move2 = escape_string(
+                retrieve_pokemon_move(pokemon["move2"], pokemon_name)["name"]
+            )
+            if pokemon_is_alolan(pokemon_name, move1, move2):
                 pokemon_name += " Alola"
 
-            if pokemon_is_galarian(pokemon_name, dict_pokemon_move["name"]):
+            if pokemon_is_galarian(pokemon_name, move1, move2):
                 pokemon_name += " Galar"
 
             with open(f"./data/dict_ranking_1500.json", "r") as file:
