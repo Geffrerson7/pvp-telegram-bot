@@ -94,3 +94,7 @@ Stop sending coordinates:
 ```bash
   /stop
 ```
+
+## Demo
+
+[![](https://markdown-videos-api.jorgenkh.no/youtube/0StbpCOGDZU)](https://youtu.be/0StbpCOGDZU "PVP Telegram Bot Demo Video")
