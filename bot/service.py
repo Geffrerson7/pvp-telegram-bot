@@ -363,11 +363,11 @@ def fetch_pvp_pokemon_data(max_cp: int):
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
             move1 = escape_string(
-                retrieve_pokemon_move(pokemon["move1"], pokemon_name)["name"]
+                retrieve_pokemon_move(pokemon["move1"], pokemon_name, 1)["name"]
             )
 
             move2 = escape_string(
-                retrieve_pokemon_move(pokemon["move2"], pokemon_name)["name"]
+                retrieve_pokemon_move(pokemon["move2"], pokemon_name, 2)["name"]
             )
             if pokemon_is_alolan(pokemon_name, move1, move2):
                 pokemon_name += " Alola"
@@ -435,20 +435,20 @@ def generate_pvp_pokemon_messages(max_cp: int):
                     longitude = data["pokemon"]["lng"]
                     flag = data["pokemon"]["flag"]
                     move1 = escape_string(
-                        retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)[
+                        retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name, 1)[
                             "name"
                         ]
                     )
                     move2 = escape_string(
-                        retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)[
+                        retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name, 2)[
                             "name"
                         ]
                     )
                     move1_icon = retrieve_pokemon_move(
-                        data["pokemon"]["move1"], pokemon_name
+                        data["pokemon"]["move1"], pokemon_name, 1
                     )["icon"]
                     move2_icon = retrieve_pokemon_move(
-                        data["pokemon"]["move2"], pokemon_name
+                        data["pokemon"]["move2"], pokemon_name, 2
                     )["icon"]
                     height = escape_string(
                         retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
