@@ -342,5 +342,6 @@
   "403": { "name": "Ataque Arena", "type": "Tierra" },
   "404": { "name": "Meteoimpacto", "type": "Acero" },
   "405": { "name": "Rayo Umbr\u00edo", "type": "Fantasma" },
-  "408": { "name": "Patada Salto Alta", "type": "Lucha" }
+  "408": { "name": "Patada Salto Alta", "type": "Lucha" },
+  "462": { "name": "Palmeo", "type": "Lucha" }
 }
