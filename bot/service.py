@@ -197,7 +197,7 @@ def retrieve_move_icon(move_type):
         return ""
 
 
-def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
+def retrieve_pokemon_move(pokemon_move_id, pokemon_name, number):
     """Gets the move name of a Pokemon based on the move ID using the PokeAPI."""
 
     with open("./data/moves.json", "r") as file:
@@ -209,7 +209,7 @@ def retrieve_pokemon_move(pokemon_move_id, pokemon_name):
         icon = retrieve_move_icon(move_type)
         return {"name": move_name, "icon": icon}
     else:
-        print(f"Pokemon:{pokemon_name}, move_id:{pokemon_move_id}")
+        print(f"Pokemon:{pokemon_name}, move_id:{pokemon_move_id}, number:{number}")
         return {"name": "", "icon": ""}
 
 
@@ -629,18 +629,18 @@ def calculate_rank(
 
 
 def fetch_all_pvp_pokemon_data():
-    """Fetches PvP (Player versus Player) Pokemon data for the Great League."""
-    pvp_pokemon_list = []
-
+    """Fetches PvP (Player versus Player) Pokemon data for various leagues and stores in a dictionary."""
+    pokemon_dict = {}
+    pokemon_dict_list = []
     for iv in range(100, 70, -10):
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
             pokemon_name = retrieve_pokemon_name(pokemon["pokemon_id"])
             move1 = escape_string(
-                retrieve_pokemon_move(pokemon["move1"], pokemon_name)["name"]
+                retrieve_pokemon_move(pokemon["move1"], pokemon_name, 1)["name"]
             )
             move2 = escape_string(
-                retrieve_pokemon_move(pokemon["move2"], pokemon_name)["name"]
+                retrieve_pokemon_move(pokemon["move2"], pokemon_name, 2)["name"]
             )
             if pokemon_is_alolan(pokemon_name, move1, move2):
                 pokemon_name += " Alola"
@@ -657,62 +657,60 @@ def fetch_all_pvp_pokemon_data():
             with open(f"./data/dict_ranking_9999.json", "r") as file:
                 rankings_master_data = json.load(file)
 
-            first_rank_1500 = rankings_1500_data.get(pokemon_name)
-            first_rank_2500 = rankings_2500_data.get(pokemon_name)
-            first_rank_master = rankings_master_data.get(pokemon_name)
+            first_rank_1500 = rankings_1500_data.get(pokemon_name, null_rank)
+            first_rank_2500 = rankings_2500_data.get(pokemon_name, null_rank)
+            first_rank_master = rankings_master_data.get(pokemon_name, null_rank)
 
-            if not first_rank_1500:
-                first_rank_1500 = null_rank
-
-            if not first_rank_2500:
-                first_rank_2500 = null_rank
-
-            if not first_rank_master:
-                first_rank_master = null_rank
+            pokemon_dict = {
+                "name": pokemon_name,
+                "pokemon": pokemon,
+                "iv": iv,
+                "leagues": [],
+            }
 
             if (
                 pokemon["attack"] == first_rank_1500["attackStat"]
                 and pokemon["defence"] == first_rank_1500["defenseStat"]
                 and pokemon["stamina"] == first_rank_1500["healthStat"]
             ):
-                pokemon_dict_1500 = {
-                    "pokemon": pokemon,
-                    "ranking": first_rank_1500,
-                    "name": pokemon_name,
-                    "iv": iv,
-                    "max_cp": 1500,
-                }
-                pvp_pokemon_list.append(pokemon_dict_1500)
+                pokemon_dict["leagues"].append(
+                    {"ranking": first_rank_1500, "max_cp": 1500}
+                )
 
             if (
                 pokemon["attack"] == first_rank_2500["attackStat"]
                 and pokemon["defence"] == first_rank_2500["defenseStat"]
                 and pokemon["stamina"] == first_rank_2500["healthStat"]
             ):
-                pokemon_dict_2500 = {
-                    "pokemon": pokemon,
-                    "ranking": first_rank_2500,
-                    "name": pokemon_name,
-                    "iv": iv,
-                    "max_cp": 2500,
-                }
-                pvp_pokemon_list.append(pokemon_dict_2500)
+                pokemon_dict["leagues"].append(
+                    {"ranking": first_rank_2500, "max_cp": 2500}
+                )
 
             if (
                 pokemon["attack"] == first_rank_master["attackStat"]
                 and pokemon["defence"] == first_rank_master["defenseStat"]
                 and pokemon["stamina"] == first_rank_master["healthStat"]
             ):
-                pokemon_dict_master = {
-                    "pokemon": pokemon,
-                    "ranking": first_rank_master,
-                    "name": pokemon_name,
-                    "iv": iv,
-                    "max_cp": 9999,
-                }
-                pvp_pokemon_list.append(pokemon_dict_master)
+                pokemon_dict["leagues"].append(
+                    {"ranking": first_rank_master, "max_cp": 9999}
+                )
 
-    return pvp_pokemon_list
+            if len(pokemon_dict["leagues"]) != 0:
+                pokemon_dict_list.append(pokemon_dict)
+    return pokemon_dict_list
+
+
+def leagues_signature(leagues_list):
+    pokemon_leagues = []
+    for league in leagues_list:
+        if league["max_cp"] == 1500:
+            pokemon_leagues.append("🅶🅻")
+        elif league["max_cp"] == 2500:
+            pokemon_leagues.append("🆄🅻")
+        else:
+            pokemon_leagues.append("🅼🅻")
+
+    return "-".join(pokemon_leagues)
 
 
 def generate_all_pvp_pokemon_messages():
@@ -744,20 +742,20 @@ def generate_all_pvp_pokemon_messages():
                     longitude = data["pokemon"]["lng"]
                     flag = data["pokemon"]["flag"]
                     move1 = escape_string(
-                        retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name)[
-                            "name"
-                        ]
+                        retrieve_pokemon_move(
+                            data["pokemon"]["move1"], pokemon_name, 1
+                        )["name"]
                     )
                     move2 = escape_string(
-                        retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name)[
-                            "name"
-                        ]
+                        retrieve_pokemon_move(
+                            data["pokemon"]["move2"], pokemon_name, 2
+                        )["name"]
                     )
                     move1_icon = retrieve_pokemon_move(
-                        data["pokemon"]["move1"], pokemon_name
+                        data["pokemon"]["move1"], pokemon_name, 1
                     )["icon"]
                     move2_icon = retrieve_pokemon_move(
-                        data["pokemon"]["move2"], pokemon_name
+                        data["pokemon"]["move2"], pokemon_name, 2
                     )["icon"]
                     height = escape_string(
                         retrieve_pokemon_height(data["pokemon"]["pokemon_id"])
@@ -766,23 +764,25 @@ def generate_all_pvp_pokemon_messages():
                         retrieve_pokemon_weight(data["pokemon"]["pokemon_id"])
                     )
                     pokemon_id = data["pokemon"]["pokemon_id"]
-                    cp_pvp_pokemon = data["ranking"]["cp"]
-                    level_pvp_pokemon = escape_string(str(data["ranking"]["level"]))
+                    cp_pvp_pokemon = data["leagues"][0]["ranking"]["cp"]
+                    level_pvp_pokemon = escape_string(
+                        str(data["leagues"][0]["ranking"]["level"])
+                    )
                     gender_icon = "♂️" if data["pokemon"]["gender"] == 1 else "♀️"
                     candy = calculate_cost(
-                        data["pokemon"]["level"], data["ranking"]["level"]
+                        data["pokemon"]["level"], data["leagues"][0]["ranking"]["level"]
                     )["candy"]
                     stardust = calculate_cost(
-                        data["pokemon"]["level"], data["ranking"]["level"]
+                        data["pokemon"]["level"], data["leagues"][0]["ranking"]["level"]
                     )["stardust"]
-                    league = league_signature(data["max_cp"])
+                    leagues = escape_string(leagues_signature(data["leagues"]))
                     formatted_message = (
                         f"*{pokemon_name}* {gender_icon}{shiny_icon} ⌚\({dsp}\)\n"
                         f"IV:{iv_number} CP:{cp} LV:{level}\n"
                         f"⚖️{weight}kg 📏{height}m\n"
                         f"{move1_icon}{move1} \| {move2_icon}{move2}\n"
                         f"                     ▼\n"
-                        f"\#0{pokemon_id} \- *{pokemon_name}* {league}\n"
+                        f"\#0{pokemon_id} \- *{pokemon_name}* {leagues}\n"
                         f"🅡1 CP:{cp_pvp_pokemon} LV:{level_pvp_pokemon}\n"
                         f"⚗️{stardust} 🍬{candy}\n"
                         f"☄️🥊🄰🄴 ᴘᴠᴘ ᴛᴏᴘ ɢᴀʟᴀxʏ🏆🌀\n"
