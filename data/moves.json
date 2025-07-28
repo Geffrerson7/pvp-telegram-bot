@@ -343,5 +343,14 @@
   "404": { "name": "Meteoimpacto", "type": "Acero" },
   "405": { "name": "Rayo Umbr\u00edo", "type": "Fantasma" },
   "408": { "name": "Patada Salto Alta", "type": "Lucha" },
-  "462": { "name": "Palmeo", "type": "Lucha" }
+  "462": { "name": "Palmeo", "type": "Lucha" },
+  "463": { "name": "Aria Burbuja", "type": "Agua" },
+  "464": { "name": "Pu\u00f1o Furia", "type": "Fantasma" },
+  "465": { "name": "Truco Floral", "type": "Planta" },
+  "466": { "name": "Rayo G\u00e9lido", "type": "Hielo" },
+  "467": { "name": "Llama G\u00e9lida", "type": "Hielo" },
+  "468": { "name": "Canto Ardiente", "type": "Fuego" },
+  "469": { "name": "Tajo Supremo", "type": "Acero" },
+  "470": { "name": "Embate Supremo", "type": "Acero" },
+  "471": { "name": "Palma Rauda", "type": "Lucha" }
 }
