@@ -215,7 +215,7 @@ def retrieve_pokemon_move(pokemon_move_id, pokemon_name, number):
 
 def coordinates_waiting_time(coordinates_list_size):
     """Obtains the excecution time of fetch_pokemon_data() function"""
-    return 1.9967 * coordinates_list_size + 131.05
+    return 1.0969 * coordinates_list_size + 4.0994
 
 
 def escape_string(input_string):
@@ -435,14 +435,14 @@ def generate_pvp_pokemon_messages(max_cp: int):
                     longitude = data["pokemon"]["lng"]
                     flag = data["pokemon"]["flag"]
                     move1 = escape_string(
-                        retrieve_pokemon_move(data["pokemon"]["move1"], pokemon_name, 1)[
-                            "name"
-                        ]
+                        retrieve_pokemon_move(
+                            data["pokemon"]["move1"], pokemon_name, 1
+                        )["name"]
                     )
                     move2 = escape_string(
-                        retrieve_pokemon_move(data["pokemon"]["move2"], pokemon_name, 2)[
-                            "name"
-                        ]
+                        retrieve_pokemon_move(
+                            data["pokemon"]["move2"], pokemon_name, 2
+                        )["name"]
                     )
                     move1_icon = retrieve_pokemon_move(
                         data["pokemon"]["move1"], pokemon_name, 1
@@ -632,6 +632,15 @@ def fetch_all_pvp_pokemon_data():
     """Fetches PvP (Player versus Player) Pokemon data for various leagues and stores in a dictionary."""
     pokemon_dict = {}
     pokemon_dict_list = []
+    with open(f"./data/dict_ranking_1500.json", "r") as file:
+        rankings_1500_data = json.load(file)
+
+    with open(f"./data/dict_ranking_2500.json", "r") as file:
+        rankings_2500_data = json.load(file)
+
+    with open(f"./data/dict_ranking_9999.json", "r") as file:
+        rankings_master_data = json.load(file)
+
     for iv in range(100, 70, -10):
         pokemons_list = fetch_pokemon_data_by_iv(iv)
         for pokemon in pokemons_list:
@@ -647,15 +656,6 @@ def fetch_all_pvp_pokemon_data():
 
             if pokemon_is_galarian(pokemon_name, move1, move2):
                 pokemon_name += " Galar"
-
-            with open(f"./data/dict_ranking_1500.json", "r") as file:
-                rankings_1500_data = json.load(file)
-
-            with open(f"./data/dict_ranking_2500.json", "r") as file:
-                rankings_2500_data = json.load(file)
-
-            with open(f"./data/dict_ranking_9999.json", "r") as file:
-                rankings_master_data = json.load(file)
 
             first_rank_1500 = rankings_1500_data.get(pokemon_name, null_rank)
             first_rank_2500 = rankings_2500_data.get(pokemon_name, null_rank)
