@@ -352,5 +352,41 @@
   "468": { "name": "Canto Ardiente", "type": "Fuego" },
   "469": { "name": "Tajo Supremo", "type": "Acero" },
   "470": { "name": "Embate Supremo", "type": "Acero" },
-  "471": { "name": "Palma Rauda", "type": "Lucha" }
+  "471": { "name": "Palma Rauda", "type": "Lucha" },
+  "472": {
+    "name": "Electrojaula",
+    "type": "El\u00e9ctrico"
+  },
+  "481": {
+    "name": "Electrojaula",
+    "type": "El\u00e9ctrico"
+  },
+  "482": {
+    "name": "Ca\u00f1\u00f3n Dinamax",
+    "type": "Drag\u00f3n"
+  },
+  "484": {
+    "name": "Fragor Escamas",
+    "type": "Drag\u00f3n"
+  },
+  "485": {
+    "name": "Agarr\u00f3n",
+    "type": "Normal"
+  },
+  "486": {
+    "name": "Dracoenerg\u00eda",
+    "type": "Drag\u00f3n"
+  },
+  "487": {
+    "name": "Danza Acu\u00e1tica",
+    "type": "Agua"
+  },
+  "488": {
+    "name": "Agua Fr\u00eda",
+    "type": "Agua"
+  },
+  "489": {
+    "name": "Sable M\u00edstico",
+    "type": "Lucha"
+  }
 }
